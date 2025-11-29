@@ -1,21 +1,58 @@
 ---
 import Layout from '../../layouts/Layout.astro';
+import { getEntryBySlug } from 'astro:content';
 
 const { slug } = Astro.params;
+const gallery = slug ? await getEntryBySlug('galleries', slug) : undefined;
 ---
 
 <Layout>
-	<main class="min-h-screen bg-white">
-		<section class="mx-auto flex max-w-4xl flex-col gap-6 px-6 py-24">
-			<p class="text-sm uppercase tracking-[0.3em] text-slate-500">Gallery</p>
-			<h1 class="text-4xl font-semibold text-slate-900">{slug?.replace(/-/g, ' ')}</h1>
-			<p class="text-lg text-slate-600">This page will showcase imagery for the "{slug}" gallery.</p>
-			<div class="grid gap-4 sm:grid-cols-2">
-				{Array.from({ length: 6 }).map((_, index) => (
-					<div class="aspect-[3/2] rounded-2xl bg-slate-100"></div>
-				))}
-			</div>
-		</section>
+	<main class="min-h-screen bg-slate-50">
+		{!gallery ? (
+			<section class="mx-auto flex max-w-3xl flex-col gap-4 px-6 py-24 text-center">
+				<h1 class="text-3xl font-semibold text-slate-900">Not found</h1>
+				<p class="text-slate-600">We couldn’t locate the requested gallery.</p>
+				<a class="text-sm font-semibold uppercase tracking-[0.3em] text-slate-500" href="/galleries"
+					>Back to galleries</a
+				>
+			</section>
+		) : (
+			<section class="mx-auto flex max-w-5xl flex-col gap-8 px-6 py-24">
+				<div class="flex flex-col gap-4">
+					<p class="text-xs uppercase tracking-[0.4em] text-slate-500">Gallery</p>
+					<h1 class="text-4xl font-semibold text-slate-900">{gallery.data.title}</h1>
+					<div class="flex flex-wrap gap-6 text-sm text-slate-600">
+						<span class="font-medium text-slate-900">{gallery.data.location}</span>
+						<span>
+							{gallery.data.date.toLocaleDateString('en-US', {
+								month: 'long',
+								day: 'numeric',
+								year: 'numeric'
+							})}
+						</span>
+					</div>
+					<img
+						class="rounded-3xl border border-slate-200 shadow-sm"
+						src={gallery.data.coverImage}
+						alt={`${gallery.data.title} cover image`}
+						loading="lazy"
+					/>
+					{gallery.data.description && (
+						<p class="text-lg leading-relaxed text-slate-600">{gallery.data.description}</p>
+					)}
+				</div>
+				<div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+					{gallery.data.images.map((imagePath: string, index: number) => (
+						<img
+							class="h-full w-full rounded-2xl border border-slate-200 object-cover shadow-sm"
+							src={imagePath}
+							alt={`${gallery.data.title} image ${index + 1}`}
+							loading="lazy"
+						/>
+					))}
+				</div>
+			</section>
+		)}
 	</main>
 </Layout>
 
