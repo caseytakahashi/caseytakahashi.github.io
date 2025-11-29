@@ -1,12 +1,19 @@
 ---
-import Welcome from '../components/Welcome.astro';
 import Layout from '../layouts/Layout.astro';
-
-// Welcome to Astro! Wondering what to do next? Check out the Astro documentation at https://docs.astro.build
-// Don't want to use any of this? Delete everything in this file, the `assets`, `components`, and `layouts` directories, and start fresh.
 ---
 
 <Layout>
-	<Welcome />
-	<h1 class="text-4xl text-red-600 bg-blue-200">Hello Tailwind!</h1>
+	<main class="min-h-screen bg-slate-50">
+		<section class="mx-auto flex max-w-4xl flex-col gap-6 px-6 py-24 text-center">
+			<p class="text-sm uppercase tracking-[0.3em] text-slate-500">Casey Photo</p>
+			<h1 class="text-4xl font-semibold text-slate-900 sm:text-5xl">Modern storytelling through images</h1>
+			<p class="text-lg text-slate-600">
+				This hero area will introduce the portfolio once copy and imagery are ready.
+			</p>
+			<div class="flex flex-wrap justify-center gap-4">
+				<a class="rounded-full bg-slate-900 px-6 py-3 text-sm font-medium text-white" href="/galleries">View galleries</a>
+				<a class="rounded-full border border-slate-900 px-6 py-3 text-sm font-medium text-slate-900" href="/contact">Book a shoot</a>
+			</div>
+		</section>
+	</main>
 </Layout>

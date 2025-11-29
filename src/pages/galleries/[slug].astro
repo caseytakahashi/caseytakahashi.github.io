@@ -1,0 +1,21 @@
+---
+import Layout from '../../layouts/Layout.astro';
+
+const { slug } = Astro.params;
+---
+
+<Layout>
+	<main class="min-h-screen bg-white">
+		<section class="mx-auto flex max-w-4xl flex-col gap-6 px-6 py-24">
+			<p class="text-sm uppercase tracking-[0.3em] text-slate-500">Gallery</p>
+			<h1 class="text-4xl font-semibold text-slate-900">{slug?.replace(/-/g, ' ')}</h1>
+			<p class="text-lg text-slate-600">This page will showcase imagery for the "{slug}" gallery.</p>
+			<div class="grid gap-4 sm:grid-cols-2">
+				{Array.from({ length: 6 }).map((_, index) => (
+					<div class="aspect-[3/2] rounded-2xl bg-slate-100"></div>
+				))}
+			</div>
+		</section>
+	</main>
+</Layout>
+
