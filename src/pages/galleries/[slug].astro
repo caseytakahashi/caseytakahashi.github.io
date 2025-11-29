@@ -1,9 +1,13 @@
 ---
 import Layout from '../../layouts/Layout.astro';
-import { getEntryBySlug } from 'astro:content';
+import { getCollection, type CollectionEntry } from 'astro:content';
+
+type GalleryEntry = CollectionEntry<'galleries'>;
 
 const { slug } = Astro.params;
-const gallery = slug ? await getEntryBySlug('galleries', slug) : undefined;
+const galleries = await getCollection('galleries');
+const gallery: GalleryEntry | undefined =
+	typeof slug === 'string' ? galleries.find((entry) => entry.data.slug === slug) : undefined;
 ---
 
 <Layout>

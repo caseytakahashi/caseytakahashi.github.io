@@ -6,7 +6,7 @@ const pathString = z
 	.regex(/^\/.+/, 'Use a URL path that starts with "/" (e.g. /images/cover.jpg)');
 
 const galleries = defineCollection({
-	type: 'data',
+	type: 'content',
 	schema: z.object({
 		title: z.string(),
 		slug: z.string(),
