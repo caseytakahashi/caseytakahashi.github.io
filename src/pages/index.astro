@@ -1,9 +1,17 @@
 ---
 import Layout from '../layouts/Layout.astro';
+import { getCollection, type CollectionEntry } from 'astro:content';
+
+const featuredGalleries = (await getCollection('galleries'))
+	.sort(
+		(a: CollectionEntry<'galleries'>, b: CollectionEntry<'galleries'>) =>
+			b.data.date.valueOf() - a.data.date.valueOf()
+	)
+	.slice(0, 3);
 ---
 
 <Layout>
-	<main class="min-h-screen bg-slate-50">
+	<main class="bg-slate-50">
 		<section class="mx-auto flex max-w-4xl flex-col gap-6 px-6 py-24 text-center">
 			<p class="text-sm uppercase tracking-[0.3em] text-slate-500">Casey Photo</p>
 			<h1 class="text-4xl font-semibold text-slate-900 sm:text-5xl">Modern storytelling through images</h1>
@@ -14,6 +22,49 @@ import Layout from '../layouts/Layout.astro';
 				<a class="rounded-full bg-slate-900 px-6 py-3 text-sm font-medium text-white" href="/galleries">View galleries</a>
 				<a class="rounded-full border border-slate-900 px-6 py-3 text-sm font-medium text-slate-900" href="/contact">Book a shoot</a>
 			</div>
+		</section>
+		<section class="mx-auto flex max-w-6xl flex-col gap-8 px-6 pb-24">
+			<div class="flex items-center justify-between">
+				<div>
+					<p class="text-sm uppercase tracking-[0.3em] text-slate-500">Featured galleries</p>
+					<h2 class="text-3xl font-semibold text-slate-900">Recent stories</h2>
+				</div>
+				<a class="text-sm font-semibold text-slate-900 underline-offset-4 hover:underline" href="/galleries"
+					>View all</a
+				>
+			</div>
+			{featuredGalleries.length === 0 ? (
+				<p class="text-slate-600">Featured collections will appear here once galleries are published.</p>
+			) : (
+				<div class="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+					{featuredGalleries.map((gallery: CollectionEntry<'galleries'>) => (
+						<a
+							class="group overflow-hidden rounded-2xl border border-slate-200 bg-white transition hover:border-slate-400 hover:shadow-lg"
+							href={`/galleries/${gallery.data.slug}`}
+						>
+							<div class="aspect-4/3 w-full overflow-hidden bg-slate-100">
+								<img
+									class="h-full w-full object-cover transition duration-500 group-hover:scale-105"
+									src={gallery.data.coverImage}
+									alt={gallery.data.title}
+									loading="lazy"
+								/>
+							</div>
+							<div class="flex flex-col gap-1 px-5 py-5">
+								<h3 class="text-xl font-semibold text-slate-900">{gallery.data.title}</h3>
+								<p class="text-sm text-slate-500">{gallery.data.location}</p>
+								<p class="text-xs uppercase tracking-[0.2em] text-slate-400">
+									{gallery.data.date.toLocaleDateString('en-US', {
+										month: 'short',
+										day: 'numeric',
+										year: 'numeric'
+									})}
+								</p>
+							</div>
+						</a>
+					))}
+				</div>
+			)}
 		</section>
 	</main>
 </Layout>
