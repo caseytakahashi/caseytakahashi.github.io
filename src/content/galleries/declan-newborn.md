@@ -7,7 +7,6 @@ coverImage: '/galleries/declan-newborn/cover.jpg'
 images:
   - '/galleries/declan-newborn/01.jpg'
   - '/galleries/declan-newborn/02.jpg'
-  - '/galleries/declan-newborn/03.jpg'
 description: 'A cozy in-home newborn session featuring soft light and quiet storytelling.'
 ---
 

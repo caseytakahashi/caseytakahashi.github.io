@@ -8,7 +8,6 @@ images:
   - '/galleries/jocelyn-city-hall-engagement/01.jpg'
   - '/galleries/jocelyn-city-hall-engagement/02.jpg'
   - '/galleries/jocelyn-city-hall-engagement/03.jpg'
-  - '/galleries/jocelyn-city-hall-engagement/04.jpg'
 description: 'Editorial-inspired portraits that lean into marble architecture and soft afternoon light.'
 ---
 
