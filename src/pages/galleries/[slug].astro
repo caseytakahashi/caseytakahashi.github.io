@@ -5,11 +5,15 @@ import { readdir } from 'node:fs/promises';
 
 type GalleryEntry = CollectionEntry<'galleries'>;
 
-const { slug } = Astro.params;
-const galleries = await getCollection('galleries');
-const gallery: GalleryEntry | undefined =
-	typeof slug === 'string' ? galleries.find((entry) => entry.id === slug) : undefined;
+export async function getStaticPaths() {
+	const galleries = await getCollection('galleries');
+	return galleries.map((gallery) => ({
+		params: { slug: gallery.id },
+		props: { gallery }
+	}));
+}
 
+const { gallery } = Astro.props;
 let galleryImages: string[] = [];
 
 if (gallery) {
