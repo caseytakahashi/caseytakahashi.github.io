@@ -1,5 +1,5 @@
 ---
-title: 'Jocelyn & Mateo | City Hall Engagement'
+title: 'Jocelyn & Bryan | City Hall Engagement'
 date: 2023-10-04
 location: 'San Francisco City Hall'
 coverImage: '/galleries/jocelyn-city-hall-engagement/cover.jpg'
