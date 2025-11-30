@@ -1,13 +1,37 @@
 ---
 import Layout from '../../layouts/Layout.astro';
 import { getCollection, type CollectionEntry } from 'astro:content';
+import { readdir } from 'node:fs/promises';
 
 type GalleryEntry = CollectionEntry<'galleries'>;
 
 const { slug } = Astro.params;
 const galleries = await getCollection('galleries');
 const gallery: GalleryEntry | undefined =
-	typeof slug === 'string' ? galleries.find((entry) => entry.data.slug === slug) : undefined;
+	typeof slug === 'string' ? galleries.find((entry) => entry.id === slug) : undefined;
+
+let galleryImages: string[] = [];
+
+if (gallery) {
+	try {
+		const publicGalleryDir = new URL(
+			`../../../public/galleries/${gallery.id}/`,
+			import.meta.url
+		);
+		const files = await readdir(publicGalleryDir);
+		const fromPublic = files
+			.filter((file) => /\.(png|jpe?g|webp|avif)$/i.test(file))
+			.map((file) => `/galleries/${gallery.id}/${file}`)
+			.filter((filePath) => filePath !== gallery.data.coverImage)
+			.sort();
+
+		const configuredOrder = gallery.data.images.filter((imagePath) => fromPublic.includes(imagePath));
+		galleryImages = configuredOrder.length > 0 ? configuredOrder : fromPublic;
+	} catch (error) {
+		console.warn(`Unable to read images for gallery "${gallery.id}":`, error);
+		galleryImages = gallery.data.images;
+	}
+}
 ---
 
 <Layout>
@@ -46,7 +70,7 @@ const gallery: GalleryEntry | undefined =
 					)}
 				</div>
 				<div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-					{gallery.data.images.map((imagePath: string, index: number) => (
+					{galleryImages.map((imagePath: string, index: number) => (
 						<img
 							class="h-full w-full rounded-2xl border border-slate-200 object-cover shadow-sm"
 							src={imagePath}

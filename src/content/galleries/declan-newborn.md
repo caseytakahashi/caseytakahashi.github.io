@@ -1,6 +1,5 @@
 ---
 title: "Declan's Newborn Session"
-slug: 'declan-newborn'
 date: 2024-05-12
 location: 'Pacifica, CA'
 coverImage: '/galleries/declan-newborn/cover.jpg'

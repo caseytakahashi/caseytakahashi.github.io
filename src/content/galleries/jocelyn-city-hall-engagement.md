@@ -1,6 +1,5 @@
 ---
 title: 'Jocelyn & Mateo | City Hall Engagement'
-slug: 'jocelyn-city-hall-engagement'
 date: 2023-10-04
 location: 'San Francisco City Hall'
 coverImage: '/galleries/jocelyn-city-hall-engagement/cover.jpg'

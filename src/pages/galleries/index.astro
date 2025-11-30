@@ -20,7 +20,7 @@ const galleries = (await getCollection('galleries')).sort(
 				{galleries.map((gallery: CollectionEntry<'galleries'>) => (
 					<a
 						class="group overflow-hidden rounded-2xl border border-slate-200 bg-white transition hover:border-slate-400 hover:shadow-lg"
-						href={`/galleries/${gallery.data.slug}`}
+						href={`/galleries/${gallery.id}`}
 					>
 						<div class="aspect-4/3 w-full overflow-hidden bg-slate-100">
 							<img
