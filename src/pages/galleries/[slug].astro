@@ -5,6 +5,7 @@ import { readdir } from 'node:fs/promises';
 
 type GalleryEntry = CollectionEntry<'galleries'>;
 
+// Pre-generate gallery pages from content md files.
 export async function getStaticPaths() {
 	const galleries = await getCollection('galleries');
 	return galleries.map((gallery) => ({
@@ -24,11 +25,12 @@ if (gallery) {
 		);
 		const files = await readdir(publicGalleryDir);
 		const fromPublic = files
-			.filter((file) => /\.(png|jpe?g|webp|avif)$/i.test(file))
-			.map((file) => `/galleries/${gallery.id}/${file}`)
-			.filter((filePath) => filePath !== gallery.data.coverImage)
-			.sort();
+			.filter((file) => /\.(png|jpe?g|webp|avif)$/i.test(file)) // Only process image files.
+			.map((file) => `/galleries/${gallery.id}/${file}`) // Build URL to each image.
+			.filter((filePath) => filePath !== gallery.data.coverImage) // Exclude cover image from gallery.
+			.sort(); // Sort images alphabetically (labeled in ascending numbers).
 
+		// Filter out images from gallery that don't exist in public dir.
 		const configuredOrder = gallery.data.images.filter((imagePath) => fromPublic.includes(imagePath));
 		galleryImages = configuredOrder.length > 0 ? configuredOrder : fromPublic;
 	} catch (error) {
