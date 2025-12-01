@@ -52,8 +52,16 @@ if (gallery) {
 			</section>
 		) : (
 			<section class="mx-auto flex max-w-5xl flex-col gap-8 px-6 py-24">
+				<a
+					href="/galleries"
+					class="flex items-center text-sm text-slate-600 hover:text-slate-900 mb-4 w-fit group"
+				>
+					<svg class="h-4 w-4 mr-2 transition-transform group-hover:-translate-x-1" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 20 20">
+						<path stroke-linecap="round" stroke-linejoin="round" d="M15 10H5m0 0l5-5m-5 5l5 5" />
+					</svg>
+					Back to Portfolio
+				</a>
 				<div class="flex flex-col gap-4">
-					<p class="text-xs uppercase tracking-[0.4em] text-slate-500">Gallery</p>
 					<h1 class="text-4xl font-semibold text-slate-900">{gallery.data.title}</h1>
 					<div class="flex flex-wrap gap-6 text-sm text-slate-600">
 						<span class="font-medium text-slate-900">{gallery.data.location}</span>
