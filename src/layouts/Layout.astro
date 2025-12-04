@@ -1,5 +1,6 @@
 ---
 import '../styles/global.css';
+import Navbar from '../components/Navbar.astro';
 ---
 <!doctype html>
 <html lang="en">
@@ -8,9 +9,10 @@ import '../styles/global.css';
 		<meta name="viewport" content="width=device-width" />
 		<link rel="icon" type="image/svg+xml" href="/double-circle-favicon.svg" sizes="any" />
 		<meta name="generator" content={Astro.generator} />
-		<title>CKT Photography</title>
+		<title>Casey Takahashi Photography</title>
 	</head>
 	<body>
+		<Navbar />
 		<slot />
 	</body>
 </html>
