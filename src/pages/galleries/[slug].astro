@@ -19,14 +19,16 @@ let galleryImages: string[] = [];
 
 if (gallery) {
 	try {
+		// Remove .md extension from gallery.id to match directory name
+		const galleryDirName = gallery.id.replace(/\.md$/, '');
 		const publicGalleryDir = new URL(
-			`../../../public/galleries/${gallery.id}/`,
+			`../../../public/galleries/${galleryDirName}/`,
 			import.meta.url
 		);
 		const files = await readdir(publicGalleryDir);
 		const fromPublic = files
 			.filter((file) => /\.(png|jpe?g|webp|avif)$/i.test(file)) // Only process image files.
-			.map((file) => `/galleries/${gallery.id}/${file}`) // Build URL to each image.
+			.map((file) => `/galleries/${galleryDirName}/${file}`) // Build URL to each image.
 			.filter((filePath) => filePath !== gallery.data.coverImage) // Exclude cover image from gallery.
 			.sort(); // Sort images alphabetically (labeled in ascending numbers).
 
