@@ -1,1 +1,7 @@
+@import url('https://fonts.googleapis.com/css2?family=Nanum+Myeongjo:wght@400&display=swap');
+
 @import "tailwindcss";
+
+@theme {
+    --font-myeongjo: "Nanum Myeongjo", serif;
+}
