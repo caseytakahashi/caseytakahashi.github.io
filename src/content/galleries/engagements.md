@@ -1,7 +1,7 @@
 ---
 title: 'Engagements'
 location: 'San Francisco City Hall'
-coverImage: '/galleries/engagements/02.jpg'
+coverImage: '/galleries/engagements/01.jpg'
 images:
   - '/galleries/engagements/01.jpg'
   - '/galleries/engagements/02.jpg'
@@ -11,6 +11,7 @@ images:
   - '/galleries/engagements/06.jpg'
   - '/galleries/engagements/07.jpg'
   - '/galleries/engagements/08.jpg'
+  - '/galleries/engagements/09.jpg'
   - '/galleries/engagements/10.jpg'
   - '/galleries/engagements/11.jpg'
   - '/galleries/engagements/12.jpg'

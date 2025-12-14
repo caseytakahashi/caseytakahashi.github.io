@@ -5,7 +5,7 @@ coverImage: '/galleries/newborns/01.jpg'
 images:
   - '/galleries/newborns/01.jpg'
   - '/galleries/newborns/02.jpg'
-  - '/galleries/newborn/03.jpg'
+  - '/galleries/newborns/03.jpg'
   - '/galleries/newborns/04.jpg'
   - '/galleries/newborns/05.jpg'
   - '/galleries/newborns/06.jpg'
