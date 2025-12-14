@@ -29,7 +29,6 @@ if (gallery) {
 		const fromPublic = files
 			.filter((file) => /\.(png|jpe?g|webp|avif)$/i.test(file)) // Only process image files.
 			.map((file) => `/galleries/${galleryDirName}/${file}`) // Build URL to each image.
-			.filter((filePath) => filePath !== gallery.data.coverImage) // Exclude cover image from gallery.
 			.sort(); // Sort images alphabetically (labeled in ascending numbers).
 
 		// Filter out images from gallery that don't exist in public dir.
@@ -67,13 +66,6 @@ if (gallery) {
 					<h1 class="text-4xl font-semibold text-slate-900">{gallery.data.title}</h1>
 					<div class="flex flex-wrap gap-6 text-sm text-slate-600">
 						<span class="font-medium text-slate-900">{gallery.data.location}</span>
-						<span>
-							{gallery.data.date.toLocaleDateString('en-US', {
-								month: 'long',
-								day: 'numeric',
-								year: 'numeric'
-							})}
-						</span>
 					</div>
 					<img
 						class="rounded-3xl border border-slate-200 shadow-sm"

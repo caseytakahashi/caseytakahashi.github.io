@@ -2,10 +2,7 @@
 import Layout from '../../layouts/Layout.astro';
 import { getCollection, type CollectionEntry } from 'astro:content';
 
-const galleries = (await getCollection('galleries')).sort(
-	(a: CollectionEntry<'galleries'>, b: CollectionEntry<'galleries'>) =>
-		b.data.date.valueOf() - a.data.date.valueOf()
-);
+const galleries = (await getCollection('galleries'))
 ---
 
 <Layout>
@@ -33,13 +30,6 @@ const galleries = (await getCollection('galleries')).sort(
 						<div class="flex flex-col gap-2 px-5 py-6">
 							<h2 class="text-xl font-semibold text-slate-900">{gallery.data.title}</h2>
 							<p class="text-sm text-slate-500">{gallery.data.location}</p>
-							<p class="text-xs uppercase tracking-[0.2em] text-slate-400">
-								{gallery.data.date.toLocaleDateString('en-US', {
-									month: 'short',
-									day: 'numeric',
-									year: 'numeric'
-								})}
-							</p>
 						</div>
 					</a>
 				))}

@@ -2,12 +2,7 @@
 import Layout from '../layouts/Layout.astro';
 import { getCollection, type CollectionEntry } from 'astro:content';
 
-const featuredGalleries = (await getCollection('galleries'))
-	.sort(
-		(a: CollectionEntry<'galleries'>, b: CollectionEntry<'galleries'>) =>
-			b.data.date.valueOf() - a.data.date.valueOf()
-	)
-	.slice(0, 3);
+const galleries = (await getCollection('galleries'))
 ---
 
 <Layout>
@@ -33,11 +28,11 @@ const featuredGalleries = (await getCollection('galleries'))
 					>View all</a
 				>
 			</div>
-			{featuredGalleries.length === 0 ? (
+			{galleries.length === 0 ? (
 				<p class="text-slate-600">Featured collections will appear here once galleries are published.</p>
 			) : (
 				<div class="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-					{featuredGalleries.map((gallery: CollectionEntry<'galleries'>) => (
+					{galleries.map((gallery: CollectionEntry<'galleries'>) => (
 						<a
 							class="group overflow-hidden rounded-2xl border border-slate-200 bg-white transition hover:border-slate-400 hover:shadow-lg"
 							href={`/galleries/${gallery.id}`}
@@ -53,13 +48,6 @@ const featuredGalleries = (await getCollection('galleries'))
 							<div class="flex flex-col gap-1 px-5 py-5">
 								<h3 class="text-xl font-semibold text-slate-900">{gallery.data.title}</h3>
 								<p class="text-sm text-slate-500">{gallery.data.location}</p>
-								<p class="text-xs uppercase tracking-[0.2em] text-slate-400">
-									{gallery.data.date.toLocaleDateString('en-US', {
-										month: 'short',
-										day: 'numeric',
-										year: 'numeric'
-									})}
-								</p>
 							</div>
 						</a>
 					))}
