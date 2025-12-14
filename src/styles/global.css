@@ -5,3 +5,14 @@
 @theme {
     --font-myeongjo: "Nanum Myeongjo", serif;
 }
+
+@layer components {
+    .nav-link {
+      @apply font-myeongjo uppercase
+             text-xs sm:text-sm lg:text-base
+             tracking-[0.22em] sm:tracking-[0.28em] lg:tracking-[0.30em]
+             text-gray-900
+             transition-colors
+             hover:text-gray-600;
+    }
+  }
