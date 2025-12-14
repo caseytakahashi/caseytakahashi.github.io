@@ -14,7 +14,8 @@ const galleries = defineCollection({
 		location: z.string(),
 		coverImage: pathString,
 		images: z.array(pathString),
-		description: z.string().optional()
+		description: z.string().optional(),
+		leftOffset: z.number().int().min(-20).max(20).optional()
 	})
 });
 

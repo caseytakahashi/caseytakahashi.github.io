@@ -21,6 +21,7 @@ images:
   - '/galleries/engagements/16.jpg'
   - '/galleries/engagements/17.jpg'
 description: 'Editorial-inspired portraits that lean into marble architecture and soft afternoon light.'
+leftOffset: -1
 ---
 
 The final gallery will feature architectural frames, motion blur experiments, and quiet in-between moments captured around the grand staircase and rotunda.

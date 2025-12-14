@@ -43,6 +43,19 @@ if (gallery) {
 const leftImages = galleryImages.filter((_, i) => i % 2 === 0);
 const rightImages = galleryImages.filter((_, i) => i % 2 === 1);
 
+// Manually move images to the left or right column based on the leftOffset value.
+const leftOffset = gallery.data.leftOffset ?? 0;
+if (leftOffset > 0) {
+  // Move images from right to left.
+  const moved = rightImages.splice(-leftOffset);
+  leftImages.push(...moved);
+} else if (leftOffset < 0) {
+  // Move images from left to right if offset is negative.
+  const moved = leftImages.splice(leftOffset); 
+  rightImages.push(...moved);
+}
+
+
 ---
 
 <Layout>
