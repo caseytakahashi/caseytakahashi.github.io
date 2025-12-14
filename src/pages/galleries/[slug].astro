@@ -72,15 +72,17 @@ const rightImages = galleryImages.filter((_, i) => i % 2 === 1);
 						<span class="font-medium text-slate-900">{gallery.data.location}</span>
 					</div>
 				</div>
-				<div class="grid grid-cols-1 lg:grid-cols-2 gap-2 sm:gap-3">
+				<div class="grid grid-cols-1 md:grid-cols-2 gap-2 sm:gap-3">
 					<!-- Left column -->
 					<div class="flex flex-col gap-2 sm:gap-3">
 						{leftImages.map((imagePath: string, index: number) => (
 						<img
-							class="w-full h-auto border border-slate-200 shadow-sm"
+							class="w-full h-auto border border-slate-200 shadow-sm cursor-pointer"
 							src={imagePath}
 							alt={`${gallery.data.title} image ${index * 2 + 1}`}
 							loading="lazy"
+							data-index={index * 2}
+							data-gallery-image
 						/>
 						))}
 					</div>
@@ -88,16 +90,208 @@ const rightImages = galleryImages.filter((_, i) => i % 2 === 1);
 					<div class="flex flex-col gap-2 sm:gap-3">
 						{rightImages.map((imagePath: string, index: number) => (
 						<img
-							class="w-full h-auto border border-slate-200 shadow-sm"
+							class="w-full h-auto border border-slate-200 shadow-sm cursor-pointer"
 							src={imagePath}
 							alt={`${gallery.data.title} image ${index * 2 + 2}`}
 							loading="lazy"
+							data-index={index * 2 + 1}
+							data-gallery-image
 						/>
 						))}
+					</div>
+				</div>
+
+				<!-- Lightbox Modal -->
+				<div
+					id="lightbox-modal"
+					class="fixed inset-0 z-50 hidden items-center justify-center bg-black/90 backdrop-blur-sm"
+					role="dialog"
+					aria-modal="true"
+					aria-label="Image lightbox"
+					aria-hidden="true"
+				>
+					<!-- Backdrop (clickable to close) -->
+					<div class="absolute inset-0" data-lightbox-backdrop></div>
+
+					<!-- Close button -->
+					<button
+						id="lightbox-close"
+						class="absolute top-4 right-4 z-10 flex h-10 w-10 items-center justify-center rounded-full bg-white/10 text-white transition-colors hover:bg-white/20 focus:outline-none focus:ring-2 focus:ring-white/50"
+						aria-label="Close lightbox"
+					>
+						<svg class="h-6 w-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+							<path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+						</svg>
+					</button>
+
+					<!-- Navigation buttons -->
+					<button
+						id="lightbox-prev"
+						class="absolute left-4 top-1/2 z-10 flex h-12 w-12 -translate-y-1/2 items-center justify-center rounded-full bg-white/10 text-white transition-colors hover:bg-white/20 focus:outline-none focus:ring-2 focus:ring-white/50"
+						aria-label="Previous image"
+					>
+						<svg class="h-6 w-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+							<path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7" />
+						</svg>
+					</button>
+
+					<button
+						id="lightbox-next"
+						class="absolute right-4 top-1/2 z-10 flex h-12 w-12 -translate-y-1/2 items-center justify-center rounded-full bg-white/10 text-white transition-colors hover:bg-white/20 focus:outline-none focus:ring-2 focus:ring-white/50"
+						aria-label="Next image"
+					>
+						<svg class="h-6 w-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+							<path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7" />
+						</svg>
+					</button>
+
+					<!-- Image container -->
+					<div class="relative z-10 flex max-h-[90vh] max-w-[90vw] items-center justify-center p-4">
+						<img
+							id="lightbox-image"
+							class="max-h-[90vh] max-w-[90vw] object-contain"
+							src=""
+							alt=""
+							data-lightbox-image
+						/>
 					</div>
 				</div>
 			</section>
 		)}
 	</main>
 </Layout>
+
+<script>
+	const modal = document.getElementById('lightbox-modal');
+	const modalImage = document.getElementById('lightbox-image');
+	const closeBtn = document.getElementById('lightbox-close');
+	const prevBtn = document.getElementById('lightbox-prev');
+	const nextBtn = document.getElementById('lightbox-next');
+	const backdrop = document.querySelector('[data-lightbox-backdrop]');
+	const galleryImagesList = Array.from(document.querySelectorAll('[data-gallery-image]'));
+
+	// Build images array from DOM elements, sorted by data-index
+	const images = galleryImagesList
+		.map((img) => ({
+			src: (img as HTMLImageElement).src,
+			alt: (img as HTMLImageElement).alt,
+			index: parseInt(img.getAttribute('data-index') || '0', 10)
+		}))
+		.sort((a, b) => a.index - b.index)
+		.map((item) => item.src);
+
+	let currentIndex = 0;
+
+	function openLightbox(index: number) {
+		if (!modal || !modalImage || index < 0 || index >= images.length) return;
+
+		currentIndex = index;
+		(modalImage as HTMLImageElement).src = images[index];
+		(modalImage as HTMLImageElement).alt = galleryImagesList.find(
+			(img) => parseInt(img.getAttribute('data-index') || '0', 10) === index
+		)?.getAttribute('alt') || `Image ${index + 1}`;
+
+		modal.classList.remove('hidden');
+		modal.classList.add('flex');
+		modal.setAttribute('aria-hidden', 'false');
+		document.body.style.overflow = 'hidden';
+
+		// Update navigation button visibility
+		updateNavigationButtons();
+	}
+
+	function closeLightbox() {
+		if (!modal) return;
+
+		modal.classList.add('hidden');
+		modal.classList.remove('flex');
+		modal.setAttribute('aria-hidden', 'true');
+		document.body.style.overflow = '';
+
+		// Clear image src to stop loading
+		if (modalImage) {
+			(modalImage as HTMLImageElement).src = '';
+		}
+	}
+
+	function navigate(direction: 'prev' | 'next') {
+		if (images.length === 0) return;
+
+		if (direction === 'prev') {
+			currentIndex = currentIndex > 0 ? currentIndex - 1 : images.length - 1;
+		} else {
+			currentIndex = currentIndex < images.length - 1 ? currentIndex + 1 : 0;
+		}
+
+		if (modalImage) {
+			(modalImage as HTMLImageElement).src = images[currentIndex];
+			const imgElement = galleryImagesList.find(
+				(img) => parseInt(img.getAttribute('data-index') || '0', 10) === currentIndex
+			);
+			(modalImage as HTMLImageElement).alt = imgElement?.getAttribute('alt') || `Image ${currentIndex + 1}`;
+		}
+
+		updateNavigationButtons();
+	}
+
+	function updateNavigationButtons() {
+		if (images.length <= 1) {
+			if (prevBtn) prevBtn.style.display = 'none';
+			if (nextBtn) nextBtn.style.display = 'none';
+		} else {
+			if (prevBtn) prevBtn.style.display = 'flex';
+			if (nextBtn) nextBtn.style.display = 'flex';
+		}
+	}
+
+	// Open lightbox on image click
+	galleryImagesList.forEach((img) => {
+		img.addEventListener('click', () => {
+			const index = parseInt(img.getAttribute('data-index') || '0', 10);
+			openLightbox(index);
+		});
+	});
+
+	// Close button
+	if (closeBtn) {
+		closeBtn.addEventListener('click', closeLightbox);
+	}
+
+	// Navigation buttons
+	if (prevBtn) {
+		prevBtn.addEventListener('click', () => navigate('prev'));
+	}
+	if (nextBtn) {
+		nextBtn.addEventListener('click', () => navigate('next'));
+	}
+
+	// Backdrop click (but not image click)
+	if (backdrop) {
+		backdrop.addEventListener('click', (e) => {
+			if (e.target === backdrop) {
+				closeLightbox();
+			}
+		});
+	}
+
+	// Prevent image click from closing modal
+	if (modalImage) {
+		modalImage.addEventListener('click', (e) => {
+			e.stopPropagation();
+		});
+	}
+
+	// Keyboard navigation
+	document.addEventListener('keydown', (e) => {
+		if (!modal || modal.classList.contains('hidden')) return;
+
+		if (e.key === 'Escape') {
+			closeLightbox();
+		} else if (e.key === 'ArrowLeft') {
+			navigate('prev');
+		} else if (e.key === 'ArrowRight') {
+			navigate('next');
+		}
+	});
+</script>
 
