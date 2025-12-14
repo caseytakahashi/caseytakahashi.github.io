@@ -7,12 +7,25 @@
 }
 
 @layer components {
-    .nav-link {
+    .nav-link-desktop {
       @apply font-myeongjo uppercase
              text-xs sm:text-sm lg:text-base
              tracking-[0.22em] sm:tracking-[0.28em] lg:tracking-[0.30em]
              text-gray-900
              transition-colors
              hover:text-gray-600;
+    }
+
+    .nav-link-mobile {
+        @apply block
+        px-4 py-3
+        text-sm
+        font-myeongjo
+        uppercase
+        tracking-[0.22em]
+        text-gray-900
+        transition-colors
+        hover:bg-gray-50 hover:text-gray-700
+        focus:outline-none focus:bg-gray-50 focus:text-gray-700;
     }
   }
