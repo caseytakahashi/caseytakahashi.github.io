@@ -85,7 +85,23 @@ if (leftOffset > 0) {
 						<span class="font-medium text-slate-900">{gallery.data.location}</span>
 					</div>
 				</div>
-				<div class="grid grid-cols-1 md:grid-cols-2 gap-2 sm:gap-3">
+
+				<!-- Mobile: 1 column, strict file order -->
+				<div class="flex flex-col gap-2 sm:gap-3 md:hidden">
+				{galleryImages.map((imagePath: string, index: number) => (
+					<img
+					class="w-full h-auto border border-slate-200 shadow-sm cursor-pointer"
+					src={imagePath}
+					alt={`${gallery.data.title} image ${index + 1}`}
+					loading="lazy"
+					data-index={index}
+					data-gallery-image
+					/>
+				))}
+				</div>
+
+				<!-- Desktop+: 2 columns, masonry-ish distribution -->
+				<div class="hidden md:grid md:grid-cols-2 gap-2 sm:gap-3">
 					<!-- Left column -->
 					<div class="flex flex-col gap-2 sm:gap-3">
 						{leftImages.map((imagePath: string, index: number) => (
@@ -99,6 +115,7 @@ if (leftOffset > 0) {
 						/>
 						))}
 					</div>
+
 					<!-- Right column -->
 					<div class="flex flex-col gap-2 sm:gap-3">
 						{rightImages.map((imagePath: string, index: number) => (
