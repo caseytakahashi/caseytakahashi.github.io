@@ -7,7 +7,7 @@ const galleries = (await getCollection('galleries'))
 
 <Layout>
 	<main class="min-h-screen bg-slate-50">
-		<section class="mx-auto flex max-w-6xl flex-col gap-8 px-6 py-24">
+		<section class="mx-auto flex max-w-7xl flex-col gap-8 px-8 sm:px-14 lg:px-24 py-24">
 			<div>
 				<p class="text-sm uppercase tracking-[0.3em] text-slate-500">Portfolio</p>
 				<h1 class="text-4xl font-semibold text-slate-900">Curated shoots</h1>
@@ -16,7 +16,7 @@ const galleries = (await getCollection('galleries'))
 			<div class="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
 				{galleries.map((gallery: CollectionEntry<'galleries'>) => (
 					<a
-						class="group overflow-hidden rounded-2xl border border-slate-200 bg-white transition hover:border-slate-400 hover:shadow-lg"
+						class="group overflow-hidden rounded-lg border border-slate-200 bg-white transition hover:border-slate-400 hover:shadow-lg"
 						href={`/galleries/${gallery.id}`}
 					>
 						<div class="aspect-4/3 w-full overflow-hidden bg-slate-100">
