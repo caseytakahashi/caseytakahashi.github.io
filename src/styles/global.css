@@ -105,6 +105,7 @@
         border 
         border-slate-200 
         bg-white
+        max-w-md
         p-6;
     }
 
