@@ -2,6 +2,8 @@
 import Layout from '../../layouts/Layout.astro';
 import { getCollection, type CollectionEntry } from 'astro:content';
 import { readdir } from 'node:fs/promises';
+import { join } from 'node:path';
+import { fileURLToPath } from 'node:url';
 
 type GalleryEntry = CollectionEntry<'galleries'>;
 
@@ -17,6 +19,33 @@ export async function getStaticPaths() {
 const { gallery } = Astro.props;
 let galleryImages: string[] = [];
 
+// Recursively collect all image files from a directory
+async function collectImages(dirPath: string, basePath: string, relativePath: string = ''): Promise<string[]> {
+	const images: string[] = [];
+	try {
+		const entries = await readdir(dirPath, { withFileTypes: true });
+		
+		for (const entry of entries) {
+			const fullPath = join(dirPath, entry.name);
+			const relativeFilePath = relativePath ? `${relativePath}/${entry.name}` : entry.name;
+			
+			if (entry.isDirectory()) {
+				// Recursively search subdirectories
+				const subImages = await collectImages(fullPath, basePath, relativeFilePath);
+				images.push(...subImages);
+			} else if (entry.isFile() && /\.(png|jpe?g)$/i.test(entry.name)) {
+				// Build URL path relative to /galleries/
+				const urlPath = `/galleries/${basePath}/${relativeFilePath}`;
+				images.push(urlPath);
+			}
+		}
+	} catch (error) {
+		// Silently skip directories that can't be read
+	}
+	
+	return images;
+}
+
 if (gallery) {
 	try {
 		// Remove .md extension from gallery.id to match directory name
@@ -25,11 +54,11 @@ if (gallery) {
 			`../../../public/galleries/${galleryDirName}/`,
 			import.meta.url
 		);
-		const files = await readdir(publicGalleryDir);
-		const fromPublic = files
-			.filter((file) => /\.(png|jpe?g|webp|avif)$/i.test(file)) // Only process image files.
-			.map((file) => `/galleries/${galleryDirName}/${file}`) // Build URL to each image.
-			.sort(); // Sort images alphabetically (labeled in ascending numbers).
+		const galleryDirPath = fileURLToPath(publicGalleryDir);
+		
+		// Recursively collect all images from the gallery directory and subdirectories
+		const fromPublic = await collectImages(galleryDirPath, galleryDirName);
+		fromPublic.sort(); // Sort images alphabetically
 
 		// Filter out images from gallery that don't exist in public dir.
 		const configuredOrder = gallery.data.images.filter((imagePath) => fromPublic.includes(imagePath));
