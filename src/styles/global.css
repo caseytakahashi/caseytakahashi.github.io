@@ -15,7 +15,7 @@
     .page-layout {
         @apply mx-auto 
         flex 
-        max-w-7xl 
+        max-w-6xl 
         flex-col 
         gap-8 
         px-8 
@@ -44,6 +44,16 @@
         transition-colors
         hover:bg-gray-50 hover:text-gray-700
         focus:outline-none focus:bg-gray-50 focus:text-gray-700;
+    }
+
+    .album-card-container {
+        @apply overflow-hidden 
+        rounded-lg border 
+        border-slate-200 
+        bg-white 
+        transition 
+        hover:border-slate-400 
+        hover:shadow-lg;
     }
 
     .pricing-card-container {
