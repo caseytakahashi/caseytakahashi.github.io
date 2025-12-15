@@ -7,9 +7,21 @@
 }
 
 @layer components {
-    .page-layout {
+    .page-background {
         @apply min-h-screen 
         bg-slate-50;
+    }
+
+    .page-layout {
+        @apply mx-auto 
+        flex 
+        max-w-7xl 
+        flex-col 
+        gap-8 
+        px-8 
+        sm:px-14 
+        lg:px-24 
+        py-24
     }
 
     .nav-link-desktop {
@@ -34,7 +46,7 @@
         focus:outline-none focus:bg-gray-50 focus:text-gray-700;
     }
 
-    .package-card-container {
+    .pricing-card-container {
 		@apply rounded-md
         border 
         border-slate-200 
@@ -60,5 +72,15 @@
         border-slate-200 
         bg-white
         p-6;
+    }
+
+    .contact-card-title {
+        @apply text-sm 
+        text-slate-500;
+    }
+
+    .contact-card-text {
+        @apply text-xl 
+        text-slate-900;
     }
   }
