@@ -1,20 +1,20 @@
 ---
 title: "Newborn Sessions"
 location: 'San Francisco, CA'
-coverImage: '/galleries/newborns/01.jpg'
+coverImage: '/galleries/newborns/01.webp'
 images:
-  - '/galleries/newborns/01.jpg'
-  - '/galleries/newborns/02.jpg'
-  - '/galleries/newborns/03.jpg'
-  - '/galleries/newborns/04.jpg'
-  - '/galleries/newborns/05.jpg'
-  - '/galleries/newborns/06.jpg'
-  - '/galleries/newborns/07.jpg'
-  - '/galleries/newborns/08.jpg'
-  - '/galleries/newborns/09.jpg'
-  - '/galleries/newborns/10.jpg'
-  - '/galleries/newborns/11.jpg'
-  - '/galleries/newborns/12.jpg'
+  - '/galleries/newborns/01.webp'
+  - '/galleries/newborns/02.webp'
+  - '/galleries/newborns/03.webp'
+  - '/galleries/newborns/04.webp'
+  - '/galleries/newborns/05.webp'
+  - '/galleries/newborns/06.webp'
+  - '/galleries/newborns/07.webp'
+  - '/galleries/newborns/08.webp'
+  - '/galleries/newborns/09.webp'
+  - '/galleries/newborns/10.webp'
+  - '/galleries/newborns/11.webp'
+  - '/galleries/newborns/12.webp'
 description: 'A cozy in-home newborn session featuring soft light and quiet storytelling.'
 ---
 

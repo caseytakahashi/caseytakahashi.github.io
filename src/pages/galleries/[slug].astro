@@ -33,7 +33,7 @@ async function collectImages(dirPath: string, basePath: string, relativePath: st
 				// Recursively search subdirectories
 				const subImages = await collectImages(fullPath, basePath, relativeFilePath);
 				images.push(...subImages);
-			} else if (entry.isFile() && /\.(png|jpe?g)$/i.test(entry.name)) {
+			} else if (entry.isFile() && /\.(png|jpe?g|webp)$/i.test(entry.name)) {
 				// Build URL path relative to /galleries/
 				const urlPath = `/galleries/${basePath}/${relativeFilePath}`;
 				images.push(urlPath);
