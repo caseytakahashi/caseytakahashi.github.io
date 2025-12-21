@@ -300,6 +300,47 @@ if (leftOffset > 0) {
 		}
 	}
 
+	// Mobile swipe support.
+	let touchStartX = 0;
+	let touchStartY = 0;
+	let touchEndX = 0;
+	let touchEndY = 0;
+	const SWIPE_THRESHOLD = 50; // px
+
+	function handleTouchStart(e: TouchEvent) {
+		if (e.touches.length !== 1) return; // ignore pinch / multi-touch
+		const touch = e.touches[0];
+		touchStartX = touch.clientX;
+		touchStartY = touch.clientY;
+		touchEndX = touchStartX;
+		touchEndY = touchStartY;
+	}
+
+	function handleTouchMove(e: TouchEvent) {
+		if (e.touches.length !== 1) return;
+		const touch = e.touches[0];
+		touchEndX = touch.clientX;
+		touchEndY = touch.clientY;
+	}
+
+	function handleTouchEnd() {
+		const dx = touchEndX - touchStartX;
+		const dy = touchEndY - touchStartY;
+
+		// Only treat as swipe if horizontal movement is dominant
+		if (Math.abs(dx) < SWIPE_THRESHOLD || Math.abs(dx) < Math.abs(dy)) {
+			return;
+		}
+
+		if (dx < 0) {
+			// Swiped left → next image
+			navigate('next');
+		} else {
+			// Swiped right → previous image
+			navigate('prev');
+		}
+	}
+
 	// Open lightbox on image click
 	galleryImagesList.forEach((img) => {
 		img.addEventListener('click', () => {
@@ -335,6 +376,11 @@ if (leftOffset > 0) {
 		modalImage.addEventListener('click', (e) => {
 			e.stopPropagation();
 		});
+
+		// Attach swipe listeners to the image (so you swipe directly on the photo)
+		modalImage.addEventListener('touchstart', handleTouchStart, { passive: true });
+		modalImage.addEventListener('touchmove', handleTouchMove, { passive: true });
+		modalImage.addEventListener('touchend', handleTouchEnd);
 	}
 
 	// Keyboard navigation
@@ -350,4 +396,3 @@ if (leftOffset > 0) {
 		}
 	});
 </script>
-
