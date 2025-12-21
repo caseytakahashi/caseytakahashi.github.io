@@ -83,8 +83,6 @@ if (leftOffset > 0) {
   const moved = leftImages.splice(leftOffset); 
   rightImages.push(...moved);
 }
-
-
 ---
 
 <Layout>
@@ -114,16 +112,16 @@ if (leftOffset > 0) {
 
 				<!-- Mobile: 1 column, strict file order -->
 				<div class="flex flex-col gap-2 sm:gap-3 md:hidden">
-				{galleryImages.map((imagePath: string, index: number) => (
-					<img
-					class="w-full h-auto border border-slate-200 shadow-sm cursor-pointer"
-					src={imagePath}
-					alt={`${gallery.data.title} image ${index + 1}`}
-					loading="lazy"
-					data-index={index}
-					data-gallery-image
-					/>
-				))}
+					{galleryImages.map((imagePath: string, index: number) => (
+						<img
+							class="w-full h-auto border border-slate-200 shadow-sm cursor-pointer"
+							src={imagePath}
+							alt={`${gallery.data.title} image ${index + 1}`}
+							loading="lazy"
+							data-index={index}
+							data-gallery-image
+						/>
+					))}
 				</div>
 
 				<!-- Desktop+: 2 columns, masonry-ish distribution -->
@@ -131,28 +129,28 @@ if (leftOffset > 0) {
 					<!-- Left column -->
 					<div class="flex flex-col gap-2 sm:gap-3">
 						{leftImages.map((imagePath: string, index: number) => (
-						<img
-							class="w-full h-auto border border-slate-200 shadow-sm cursor-pointer"
-							src={imagePath}
-							alt={`${gallery.data.title} image ${index * 2 + 1}`}
-							loading="lazy"
-							data-index={index * 2}
-							data-gallery-image
-						/>
+							<img
+								class="w-full h-auto border border-slate-200 shadow-sm cursor-pointer"
+								src={imagePath}
+								alt={`${gallery.data.title} image ${index * 2 + 1}`}
+								loading="lazy"
+								data-index={index * 2}
+								data-gallery-image
+							/>
 						))}
 					</div>
 
 					<!-- Right column -->
 					<div class="flex flex-col gap-2 sm:gap-3">
 						{rightImages.map((imagePath: string, index: number) => (
-						<img
-							class="w-full h-auto border border-slate-200 shadow-sm cursor-pointer"
-							src={imagePath}
-							alt={`${gallery.data.title} image ${index * 2 + 2}`}
-							loading="lazy"
-							data-index={index * 2 + 1}
-							data-gallery-image
-						/>
+							<img
+								class="w-full h-auto border border-slate-200 shadow-sm cursor-pointer"
+								src={imagePath}
+								alt={`${gallery.data.title} image ${index * 2 + 2}`}
+								loading="lazy"
+								data-index={index * 2 + 1}
+								data-gallery-image
+							/>
 						))}
 					</div>
 				</div>
@@ -172,7 +170,7 @@ if (leftOffset > 0) {
 					<!-- Close button -->
 					<button
 						id="lightbox-close"
-						class="absolute top-4 right-4 z-10 flex h-10 w-10 items-center justify-center rounded-full bg-white/10 text-white transition-colors hover:bg-white/20 focus:outline-none focus:ring-2 focus:ring-white/50"
+						class="absolute top-4 right-4 z-20 flex h-10 w-10 items-center justify-center rounded-full bg-white/10 text-white transition-colors hover:bg-white/20 focus:outline-none focus:ring-2 focus:ring-white/50"
 						aria-label="Close lightbox"
 					>
 						<svg class="h-6 w-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
@@ -183,7 +181,7 @@ if (leftOffset > 0) {
 					<!-- Navigation buttons -->
 					<button
 						id="lightbox-prev"
-						class="absolute left-4 top-1/2 z-10 flex h-12 w-12 -translate-y-1/2 items-center justify-center rounded-full bg-white/10 text-white transition-colors hover:bg-white/20 focus:outline-none focus:ring-2 focus:ring-white/50"
+						class="absolute left-4 top-1/2 z-20 flex h-12 w-12 -translate-y-1/2 items-center justify-center rounded-full bg-white/10 text-white transition-colors hover:bg-white/20 focus:outline-none focus:ring-2 focus:ring-white/50"
 						aria-label="Previous image"
 					>
 						<svg class="h-6 w-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
@@ -193,7 +191,7 @@ if (leftOffset > 0) {
 
 					<button
 						id="lightbox-next"
-						class="absolute right-4 top-1/2 z-10 flex h-12 w-12 -translate-y-1/2 items-center justify-center rounded-full bg-white/10 text-white transition-colors hover:bg-white/20 focus:outline-none focus:ring-2 focus:ring-white/50"
+						class="absolute right-4 top-1/2 z-20 flex h-12 w-12 -translate-y-1/2 items-center justify-center rounded-full bg-white/10 text-white transition-colors hover:bg-white/20 focus:outline-none focus:ring-2 focus:ring-white/50"
 						aria-label="Next image"
 					>
 						<svg class="h-6 w-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
@@ -224,17 +222,37 @@ if (leftOffset > 0) {
 	const prevBtn = document.getElementById('lightbox-prev');
 	const nextBtn = document.getElementById('lightbox-next');
 	const backdrop = document.querySelector('[data-lightbox-backdrop]');
-	const galleryImagesList = Array.from(document.querySelectorAll('[data-gallery-image]'));
+	const galleryImagesList = Array.from(
+		document.querySelectorAll('[data-gallery-image]')
+	);
 
-	// Build images array from DOM elements, sorted by data-index
-	const images = galleryImagesList
-		.map((img) => ({
-			src: (img as HTMLImageElement).src,
-			alt: (img as HTMLImageElement).alt,
-			index: parseInt(img.getAttribute('data-index') || '0', 10)
-		}))
-		.sort((a, b) => a.index - b.index)
-		.map((item) => item.src);
+	// Build meta info for each image element
+	const imageMeta = galleryImagesList.map((img) => {
+		const el = img as HTMLImageElement;
+		const index = parseInt(el.getAttribute('data-index') || '0', 10);
+
+		return {
+			index,
+			src: el.src,
+			alt: el.alt,
+		};
+	});
+
+	// De-duplicate by index (handles mobile + desktop copies)
+	const imageMap = new Map<number, { src: string; alt: string }>();
+	for (const item of imageMeta) {
+		if (!imageMap.has(item.index)) {
+			imageMap.set(item.index, { src: item.src, alt: item.alt });
+		}
+	}
+
+	// Produce ordered arrays/maps
+	const ordered = Array.from(imageMap.entries()).sort((a, b) => a[0] - b[0]);
+
+	const images = ordered.map(([, value]) => value.src);
+	const altsByIndex = new Map<number, string>(
+		ordered.map(([index, value]) => [index, value.alt])
+	);
 
 	let currentIndex = 0;
 
@@ -243,9 +261,8 @@ if (leftOffset > 0) {
 
 		currentIndex = index;
 		(modalImage as HTMLImageElement).src = images[index];
-		(modalImage as HTMLImageElement).alt = galleryImagesList.find(
-			(img) => parseInt(img.getAttribute('data-index') || '0', 10) === index
-		)?.getAttribute('alt') || `Image ${index + 1}`;
+		(modalImage as HTMLImageElement).alt =
+			altsByIndex.get(index) || `Image ${index + 1}`;
 
 		modal.classList.remove('hidden');
 		modal.classList.add('flex');
@@ -281,10 +298,8 @@ if (leftOffset > 0) {
 
 		if (modalImage) {
 			(modalImage as HTMLImageElement).src = images[currentIndex];
-			const imgElement = galleryImagesList.find(
-				(img) => parseInt(img.getAttribute('data-index') || '0', 10) === currentIndex
-			);
-			(modalImage as HTMLImageElement).alt = imgElement?.getAttribute('alt') || `Image ${currentIndex + 1}`;
+			(modalImage as HTMLImageElement).alt =
+				altsByIndex.get(currentIndex) || `Image ${currentIndex + 1}`;
 		}
 
 		updateNavigationButtons();
@@ -300,7 +315,7 @@ if (leftOffset > 0) {
 		}
 	}
 
-	// Mobile swipe support.
+	// Mobile swipe support
 	let touchStartX = 0;
 	let touchStartY = 0;
 	let touchEndX = 0;
@@ -371,13 +386,8 @@ if (leftOffset > 0) {
 		});
 	}
 
-	// Prevent image click from closing modal
+	// Attach swipe listeners to the image (so you swipe directly on the photo)
 	if (modalImage) {
-		modalImage.addEventListener('click', (e) => {
-			e.stopPropagation();
-		});
-
-		// Attach swipe listeners to the image (so you swipe directly on the photo)
 		modalImage.addEventListener('touchstart', handleTouchStart, { passive: true });
 		modalImage.addEventListener('touchmove', handleTouchMove, { passive: true });
 		modalImage.addEventListener('touchend', handleTouchEnd);
