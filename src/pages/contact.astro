@@ -5,18 +5,29 @@ import Layout from '../layouts/Layout.astro';
 <Layout>
 	<main class="page-background">
 		<section class="page-layout">
-			<p class="page-title">Contact</p>
-			<p class="text-lg text-slate-600">A simple contact form and studio info will live here.</p>
-			<div class="mt-10 grid gap-6 md:grid-cols-2">
-				<div class="contact-card-container">
-					<p class="contact-card-title">Email (Preferred)</p>
-					<p class="contact-card-text">caseytakahashiphoto@gmail.com</p>
-				</div>
-				<div class="contact-card-container">
-					<p class="contact-card-title">Phone</p>
-					<p class="contact-card-text">(408) 686-9632</p>
-				</div>
+			<p class="page-title">Let's Connect</p>
+			<div class="space-y-5 page-section-text">
+				I’d love to hear from you! Whether you’re ready to book a session or just have a few questions, you’re always welcome to reach out.
 			</div>
+
+			<section class="page-section">
+				<h2 class="page-section-header">Session Inquiry</h2>
+				<div class="space-y-5 page-section-text">
+					<p class="mb-5">If you're interested in a photography session, please fill out a quick inquiry form so I can better understand your vision and recommend the best next steps.</p> 
+					<a href="https://forms.gle/vYB2LdnewiTazAuB8" class="inquiry-link" target="_blank" rel="noopener noreferrer">Start a Session Inquiry<span class="inquiry-arrow">↗</span></a>
+				</div>
+			</section>
+
+			<hr class="page-section-divider" />
+
+			<section class="page-section">
+				<h2 class="page-section-header">Questions Welcome</h2>
+				<div class="space-y-5 page-section-text">
+					You can email me anytime at
+					<a href="mailto:caseytakahashiphoto@gmail.com" class="inquiry-link">caseytakahashiphoto@gmail.com<span class="inquiry-arrow">↗</span></a>
+					. I’m always happy to answer questions or talk through ideas.
+				</div>
+			</section>
 		</section>
 	</main>
 </Layout>
