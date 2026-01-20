@@ -34,6 +34,22 @@
             text-slate-900;
     }
 
+    .page-section {
+        @apply py-10;
+    }
+
+    .page-section-text {
+        @apply text-lg leading-relaxed text-slate-600;
+    }
+
+    .page-section-header {
+        @apply mb-5 font-myeongjo text-3xl font-semibold text-slate-900;
+    }
+
+    .page-section-divider {
+        @apply border-t border-slate-200;
+    }
+
     .landing-title {
         @apply text-center leading-tight
             text-4xl 
@@ -91,7 +107,6 @@
     .pricing-card-title {
         @apply mb-4 
         text-2xl 
-        font-semibold 
         text-slate-900;
     }
 
@@ -117,5 +132,17 @@
     .contact-card-text {
         @apply text-xl 
         text-slate-900;
+    }
+
+    .inquiry-link {
+        @apply text-blue-500 hover:text-blue-600 transition-colors;
+    }
+
+    .inquiry-arrow {
+        @apply inline-block ml-1 transition-transform duration-150 ease-out;
+    }
+
+    .inquiry-link:hover .inquiry-arrow {
+        @apply translate-x-0.5;
     }
   }
