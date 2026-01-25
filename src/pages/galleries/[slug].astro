@@ -61,7 +61,10 @@ if (gallery) {
 		fromPublic.sort(); // Sort images alphabetically
 
 		// Filter out images from gallery that don't exist in public dir.
-		const configuredOrder = gallery.data.images.filter((imagePath) => fromPublic.includes(imagePath));
+		// Convert relative filenames to full paths using basePath
+		const configuredOrder = gallery.data.images
+			.map((filename) => `${gallery.data.basePath}/${filename}`)
+			.filter((imagePath) => fromPublic.includes(imagePath));
 		galleryImages = configuredOrder.length > 0 ? configuredOrder : fromPublic;
 	} catch (error) {
 		console.warn(`Unable to read images for gallery "${gallery.id}":`, error);

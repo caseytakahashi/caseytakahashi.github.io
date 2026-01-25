@@ -19,7 +19,7 @@ const galleries = (await getCollection('galleries'))
 		</section>
 		<section class="mx-auto flex max-w-6xl flex-col gap-8 px-6 pb-24">
 			<div class="flex items-center justify-between">
-				<p class="text-sm uppercase tracking-[0.3em] text-slate-900">Featured galleries</p>
+				<p class="text-sm uppercase tracking-[0.3em] text-slate-900">Galleries</p>
 				<a class="text-sm font-semibold text-slate-900 underline-offset-4 hover:underline" href="/galleries"
 					>View all</a
 				>
@@ -36,7 +36,7 @@ const galleries = (await getCollection('galleries'))
 							<div class="aspect-4/3 w-full overflow-hidden bg-slate-100">
 								<img
 									class="h-full w-full object-cover transition duration-500 group-hover:scale-105"
-									src={gallery.data.coverImage}
+									src={`${gallery.data.basePath}/${gallery.data.coverImage}`}
 									alt={gallery.data.title}
 									loading="lazy"
 								/>

@@ -20,7 +20,7 @@ const galleries = (await getCollection('galleries'))
 						<div class="aspect-4/3 w-full overflow-hidden bg-slate-100">
 							<img
 								class="h-full w-full object-cover transition duration-500 group-hover:scale-105"
-								src={gallery.data.coverImage}
+								src={`${gallery.data.basePath}/${gallery.data.coverImage}`}
 								alt={gallery.data.title}
 								loading="lazy"
 							/>
