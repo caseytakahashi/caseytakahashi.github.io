@@ -2,7 +2,7 @@
 import Layout from '../../layouts/Layout.astro';
 import { getCollection, type CollectionEntry } from 'astro:content';
 
-const galleries = (await getCollection('galleries'))
+const galleries = (await getCollection('galleries')).sort((a, b) => a.id.localeCompare(b.id))
 ---
 
 <Layout>

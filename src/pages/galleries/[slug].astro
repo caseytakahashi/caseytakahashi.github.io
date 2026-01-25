@@ -60,15 +60,32 @@ if (gallery) {
 		const fromPublic = await collectImages(galleryDirPath, galleryDirName);
 		fromPublic.sort(); // Sort images alphabetically
 
-		// Filter out images from gallery that don't exist in public dir.
-		// Convert relative filenames to full paths using basePath
-		const configuredOrder = gallery.data.images
-			.map((filename) => `${gallery.data.basePath}/${filename}`)
-			.filter((imagePath) => fromPublic.includes(imagePath));
+		// Build configured image list from imageCount or images array
+		let configuredOrder: string[] = [];
+		if (gallery.data.imageCount) {
+			// Generate image paths from count (01.webp, 02.webp, etc.)
+			configuredOrder = Array.from(
+				{ length: gallery.data.imageCount },
+				(_, i) => `${gallery.data.basePath}/${String(i + 1).padStart(2, '0')}.webp`
+			).filter((imagePath) => fromPublic.includes(imagePath));
+		} else if (gallery.data.images) {
+			// Use explicit images array, converting filenames to full paths
+			configuredOrder = gallery.data.images
+				.map((filename) => `${gallery.data.basePath}/${filename}`)
+				.filter((imagePath) => fromPublic.includes(imagePath));
+		}
 		galleryImages = configuredOrder.length > 0 ? configuredOrder : fromPublic;
 	} catch (error) {
 		console.warn(`Unable to read images for gallery "${gallery.id}":`, error);
-		galleryImages = gallery.data.images;
+		// Fallback: generate from imageCount or use images array
+		if (gallery.data.imageCount) {
+			galleryImages = Array.from(
+				{ length: gallery.data.imageCount },
+				(_, i) => `${gallery.data.basePath}/${String(i + 1).padStart(2, '0')}.webp`
+			);
+		} else if (gallery.data.images) {
+			galleryImages = gallery.data.images.map((filename) => `${gallery.data.basePath}/${filename}`);
+		}
 	}
 }
 

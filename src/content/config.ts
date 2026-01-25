@@ -14,7 +14,8 @@ const galleries = defineCollection({
 		location: z.string(),
 		basePath: basePath,
 		coverImage: z.string().min(1, 'Cover image filename is required'),
-		images: z.array(z.string().min(1, 'Image filename is required')),
+		imageCount: z.number().int().min(1).optional(),
+		images: z.array(z.string().min(1, 'Image filename is required')).optional(),
 		description: z.string().optional(),
 		leftOffset: z.number().int().min(-20).max(20).optional()
 	})
