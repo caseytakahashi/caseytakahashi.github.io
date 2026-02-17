@@ -7,6 +7,14 @@ import { fileURLToPath } from 'node:url';
 
 type GalleryEntry = CollectionEntry<'galleries'>;
 
+// Type for galleries with subdirectories (sectioned galleries)
+interface GallerySection {
+	id: string;           // e.g., "01-landscapes"
+	displayName: string;  // e.g., "Landscapes" (title-cased)
+	description: string;  // Optional placeholder description
+	images: string[];     // Array of image URLs
+}
+
 // Pre-generate gallery pages from content md files.
 export async function getStaticPaths() {
 	const galleries = await getCollection('galleries');
@@ -18,6 +26,46 @@ export async function getStaticPaths() {
 
 const { gallery } = Astro.props;
 let galleryImages: string[] = [];
+let gallerySections: GallerySection[] = [];
+let isSectionedGallery = false;
+
+// Convert directory name to display title (e.g., "01-landscapes" -> "Landscapes")
+function toDisplayName(dirName: string): string {
+	// Remove leading number prefix (e.g., "01-", "02-") and convert to title case
+	const withoutPrefix = dirName.replace(/^\d+-/, '');
+	return withoutPrefix
+		.split('-')
+		.map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+		.join(' ');
+}
+
+// Get placeholder description for each section
+function getSectionDescription(sectionId: string): string {
+	const descriptions: Record<string, string> = {
+		'01-landscapes': 'Wide vistas and intimate details from desert canyons, mountain ridges, and coastal horizons.',
+		'02-wildlife': 'Quiet encounters with creatures in their natural habitats.',
+		'03-silhouettes': 'Form and shadow at the edges of day.',
+		'04-pets': 'Beloved companions, captured with personality and warmth.'
+	};
+	return descriptions[sectionId] || '';
+}
+
+// Collect images from a single directory (non-recursive)
+async function collectImagesFromDir(dirPath: string, basePath: string, subDir: string): Promise<string[]> {
+	const images: string[] = [];
+	try {
+		const entries = await readdir(dirPath, { withFileTypes: true });
+		for (const entry of entries) {
+			if (entry.isFile() && /\.(png|jpe?g|webp)$/i.test(entry.name)) {
+				const urlPath = `/galleries/${basePath}/${subDir}/${entry.name}`;
+				images.push(urlPath);
+			}
+		}
+	} catch (error) {
+		// Silently skip directories that can't be read
+	}
+	return images.sort();
+}
 
 // Recursively collect all image files from a directory
 async function collectImages(dirPath: string, basePath: string, relativePath: string = ''): Promise<string[]> {
@@ -46,6 +94,32 @@ async function collectImages(dirPath: string, basePath: string, relativePath: st
 	return images;
 }
 
+// Discover subdirectories and build sections
+async function discoverSections(galleryDirPath: string, galleryDirName: string): Promise<GallerySection[]> {
+	const sections: GallerySection[] = [];
+	try {
+		const entries = await readdir(galleryDirPath, { withFileTypes: true });
+		const subdirs = entries.filter(e => e.isDirectory()).sort((a, b) => a.name.localeCompare(b.name));
+		
+		for (const subdir of subdirs) {
+			const subdirPath = join(galleryDirPath, subdir.name);
+			const images = await collectImagesFromDir(subdirPath, galleryDirName, subdir.name);
+			
+			if (images.length > 0) {
+				sections.push({
+					id: subdir.name,
+					displayName: toDisplayName(subdir.name),
+					description: getSectionDescription(subdir.name),
+					images
+				});
+			}
+		}
+	} catch (error) {
+		// Fall back to non-sectioned gallery
+	}
+	return sections;
+}
+
 if (gallery) {
 	try {
 		// Remove .md extension from gallery.id to match directory name
@@ -56,28 +130,35 @@ if (gallery) {
 		);
 		const galleryDirPath = fileURLToPath(publicGalleryDir);
 		
-		// Recursively collect all images from the gallery directory and subdirectories
-		const fromPublic = await collectImages(galleryDirPath, galleryDirName);
-		fromPublic.sort(); // Sort images alphabetically
+		// First, check if this gallery has subdirectories (sectioned gallery)
+		const sections = await discoverSections(galleryDirPath, galleryDirName);
+		
+		if (sections.length > 1) {
+			// This is a sectioned gallery (like "Beyond the Portrait")
+			isSectionedGallery = true;
+			gallerySections = sections;
+			// Flatten all images for lightbox functionality
+			galleryImages = sections.flatMap(s => s.images);
+		} else {
+			// Standard flat gallery - use existing logic
+			const fromPublic = await collectImages(galleryDirPath, galleryDirName);
+			fromPublic.sort();
 
-		// Build configured image list from imageCount or images array
-		let configuredOrder: string[] = [];
-		if (gallery.data.imageCount) {
-			// Generate image paths from count (01.webp, 02.webp, etc.)
-			configuredOrder = Array.from(
-				{ length: gallery.data.imageCount },
-				(_, i) => `${gallery.data.basePath}/${String(i + 1).padStart(2, '0')}.webp`
-			).filter((imagePath) => fromPublic.includes(imagePath));
-		} else if (gallery.data.images) {
-			// Use explicit images array, converting filenames to full paths
-			configuredOrder = gallery.data.images
-				.map((filename) => `${gallery.data.basePath}/${filename}`)
-				.filter((imagePath) => fromPublic.includes(imagePath));
+			let configuredOrder: string[] = [];
+			if (gallery.data.imageCount) {
+				configuredOrder = Array.from(
+					{ length: gallery.data.imageCount },
+					(_, i) => `${gallery.data.basePath}/${String(i + 1).padStart(2, '0')}.webp`
+				).filter((imagePath) => fromPublic.includes(imagePath));
+			} else if (gallery.data.images) {
+				configuredOrder = gallery.data.images
+					.map((filename) => `${gallery.data.basePath}/${filename}`)
+					.filter((imagePath) => fromPublic.includes(imagePath));
+			}
+			galleryImages = configuredOrder.length > 0 ? configuredOrder : fromPublic;
 		}
-		galleryImages = configuredOrder.length > 0 ? configuredOrder : fromPublic;
 	} catch (error) {
 		console.warn(`Unable to read images for gallery "${gallery.id}":`, error);
-		// Fallback: generate from imageCount or use images array
 		if (gallery.data.imageCount) {
 			galleryImages = Array.from(
 				{ length: gallery.data.imageCount },
@@ -89,19 +170,31 @@ if (gallery) {
 	}
 }
 
-const leftImages = galleryImages.filter((_, i) => i % 2 === 0);
-const rightImages = galleryImages.filter((_, i) => i % 2 === 1);
+// For standard (non-sectioned) galleries: split into columns
+const leftImages = !isSectionedGallery ? galleryImages.filter((_, i) => i % 2 === 0) : [];
+const rightImages = !isSectionedGallery ? galleryImages.filter((_, i) => i % 2 === 1) : [];
 
 // Manually move images to the left or right column based on the leftOffset value.
-const leftOffset = gallery.data.leftOffset ?? 0;
-if (leftOffset > 0) {
-  // Move images from right to left.
+const leftOffset = gallery?.data?.leftOffset ?? 0;
+if (!isSectionedGallery && leftOffset > 0) {
   const moved = rightImages.splice(-leftOffset);
   leftImages.push(...moved);
-} else if (leftOffset < 0) {
-  // Move images from left to right if offset is negative.
+} else if (!isSectionedGallery && leftOffset < 0) {
   const moved = leftImages.splice(leftOffset); 
   rightImages.push(...moved);
+}
+
+// Build a global index map for lightbox navigation in sectioned galleries
+let globalImageIndex = 0;
+const sectionImageIndices: Map<string, number[]> = new Map();
+if (isSectionedGallery) {
+	for (const section of gallerySections) {
+		const indices: number[] = [];
+		for (let i = 0; i < section.images.length; i++) {
+			indices.push(globalImageIndex++);
+		}
+		sectionImageIndices.set(section.id, indices);
+	}
 }
 ---
 
@@ -115,7 +208,184 @@ if (leftOffset > 0) {
 					>Back to galleries</a
 				>
 			</section>
+		) : isSectionedGallery ? (
+			<!-- ========================================== -->
+			<!-- SECTIONED GALLERY LAYOUT (Beyond the Portrait) -->
+			<!-- ========================================== -->
+			<section class="page-layout">
+				<!-- Back link -->
+				<a
+					href="/galleries"
+					class="flex items-center text-sm text-slate-600 hover:text-slate-900 mb-4 w-fit group"
+				>
+					<svg class="h-4 w-4 mr-2 transition-transform group-hover:-translate-x-1" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 20 20">
+						<path stroke-linecap="round" stroke-linejoin="round" d="M15 10H5m0 0l5-5m-5 5l5 5" />
+					</svg>
+					Back to Portfolio
+				</a>
+
+				<!-- Page title -->
+				<div class="flex flex-col gap-4 mb-6">
+					<h1 class="page-title">{gallery.data.title}</h1>
+				</div>
+
+				<!-- Section Navigation Bar (sticky on scroll) -->
+				<nav 
+					id="section-nav"
+					class="section-nav sticky top-0 z-40 -mx-8 sm:-mx-14 lg:-mx-24 px-8 sm:px-14 lg:px-24 py-4 bg-slate-50/95 backdrop-blur-sm border-b border-slate-200 mb-16"
+				>
+					<ul class="flex flex-wrap gap-x-6 gap-y-2 md:gap-x-10">
+						{gallerySections.map((section) => (
+							<li>
+								<a 
+									href={`#${section.id}`}
+									class="section-nav-link text-sm md:text-base font-myeongjo tracking-wide text-slate-500 hover:text-slate-900 transition-colors duration-200 relative pb-1"
+									data-section-link={section.id}
+								>
+									{section.displayName}
+								</a>
+							</li>
+						))}
+					</ul>
+				</nav>
+
+				<!-- Render each section -->
+				{gallerySections.map((section, sectionIdx) => {
+					const sectionIndices = sectionImageIndices.get(section.id) || [];
+					const sectionLeftImages = section.images.filter((_, i) => i % 2 === 0);
+					const sectionRightImages = section.images.filter((_, i) => i % 2 === 1);
+					const baseIndex = sectionIndices[0] || 0;
+
+					return (
+						<section 
+							id={section.id} 
+							class={`gallery-section scroll-mt-24 ${sectionIdx > 0 ? 'mt-28 md:mt-36' : ''}`}
+							data-section-id={section.id}
+						>
+							<!-- Section header with divider line -->
+							<div class="mb-10 md:mb-14">
+								<h2 class="font-myeongjo text-2xl md:text-3xl text-slate-900 mb-3">
+									{section.displayName}
+								</h2>
+								<div class="w-12 h-px bg-slate-400 mb-5"></div>
+								{section.description && (
+									<p class="text-slate-500 text-base md:text-lg max-w-2xl leading-relaxed">
+										{section.description}
+									</p>
+								)}
+							</div>
+
+							<!-- Mobile: 1 column -->
+							<div class="flex flex-col gap-5 md:hidden">
+								{section.images.map((imagePath: string, imgIdx: number) => (
+									<img
+										class="w-full h-auto cursor-pointer transition-opacity hover:opacity-95"
+										src={imagePath}
+										alt={`${section.displayName} image ${imgIdx + 1}`}
+										loading="lazy"
+										data-index={baseIndex + imgIdx}
+										data-gallery-image
+									/>
+								))}
+							</div>
+
+							<!-- Desktop: 2 columns masonry -->
+							<div class="hidden md:grid md:grid-cols-2 gap-5 lg:gap-6">
+								<!-- Left column -->
+								<div class="flex flex-col gap-5 lg:gap-6">
+									{sectionLeftImages.map((imagePath: string, imgIdx: number) => (
+										<img
+											class="w-full h-auto cursor-pointer transition-opacity hover:opacity-95"
+											src={imagePath}
+											alt={`${section.displayName} image ${imgIdx * 2 + 1}`}
+											loading="lazy"
+											data-index={baseIndex + imgIdx * 2}
+											data-gallery-image
+										/>
+									))}
+								</div>
+
+								<!-- Right column -->
+								<div class="flex flex-col gap-5 lg:gap-6">
+									{sectionRightImages.map((imagePath: string, imgIdx: number) => (
+										<img
+											class="w-full h-auto cursor-pointer transition-opacity hover:opacity-95"
+											src={imagePath}
+											alt={`${section.displayName} image ${imgIdx * 2 + 2}`}
+											loading="lazy"
+											data-index={baseIndex + imgIdx * 2 + 1}
+											data-gallery-image
+										/>
+									))}
+								</div>
+							</div>
+						</section>
+					);
+				})}
+
+				<!-- Bottom spacer for editorial feel -->
+				<div class="h-20 md:h-28"></div>
+
+				<!-- Lightbox Modal (shared) -->
+				<div
+					id="lightbox-modal"
+					class="fixed inset-0 z-50 hidden items-center justify-center bg-black/90 backdrop-blur-sm"
+					role="dialog"
+					aria-modal="true"
+					aria-label="Image lightbox"
+					aria-hidden="true"
+				>
+					<!-- Backdrop (clickable to close) -->
+					<div class="absolute inset-0" data-lightbox-backdrop></div>
+
+					<!-- Close button -->
+					<button
+						id="lightbox-close"
+						class="absolute top-4 right-4 z-20 flex h-10 w-10 items-center justify-center rounded-full bg-white/10 text-white transition-colors hover:bg-white/20 focus:outline-none focus:ring-2 focus:ring-white/50"
+						aria-label="Close lightbox"
+					>
+						<svg class="h-6 w-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+							<path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+						</svg>
+					</button>
+
+					<!-- Navigation buttons -->
+					<button
+						id="lightbox-prev"
+						class="absolute left-4 top-1/2 z-20 flex h-12 w-12 -translate-y-1/2 items-center justify-center rounded-full bg-white/10 text-white transition-colors hover:bg-white/20 focus:outline-none focus:ring-2 focus:ring-white/50"
+						aria-label="Previous image"
+					>
+						<svg class="h-6 w-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+							<path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7" />
+						</svg>
+					</button>
+
+					<button
+						id="lightbox-next"
+						class="absolute right-4 top-1/2 z-20 flex h-12 w-12 -translate-y-1/2 items-center justify-center rounded-full bg-white/10 text-white transition-colors hover:bg-white/20 focus:outline-none focus:ring-2 focus:ring-white/50"
+						aria-label="Next image"
+					>
+						<svg class="h-6 w-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+							<path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7" />
+						</svg>
+					</button>
+
+					<!-- Image container -->
+					<div class="relative z-10 flex max-h-[90vh] max-w-[90vw] items-center justify-center p-4">
+						<img
+							id="lightbox-image"
+							class="max-h-[90vh] max-w-[90vw] object-contain"
+							src=""
+							alt=""
+							data-lightbox-image
+						/>
+					</div>
+				</div>
+			</section>
 		) : (
+			<!-- ========================================== -->
+			<!-- STANDARD FLAT GALLERY LAYOUT -->
+			<!-- ========================================== -->
 			<section class="page-layout">
 				<a
 					href="/galleries"
@@ -236,6 +506,78 @@ if (leftOffset > 0) {
 </Layout>
 
 <script>
+	// ========================================
+	// SECTION NAVIGATION (for sectioned galleries)
+	// ========================================
+	const sectionNav = document.getElementById('section-nav');
+	const sectionLinks = document.querySelectorAll('[data-section-link]');
+	const gallerySections = document.querySelectorAll('[data-section-id]');
+	
+	// Highlight active section link based on scroll position
+	function updateActiveSection() {
+		if (gallerySections.length === 0) return;
+		
+		const scrollTop = window.scrollY;
+		const navHeight = sectionNav?.offsetHeight || 0;
+		const offset = navHeight + 100; // Extra offset for better UX
+		
+		let activeSection: string | null = null;
+		
+		gallerySections.forEach((section) => {
+			const sectionTop = (section as HTMLElement).offsetTop - offset;
+			const sectionId = section.getAttribute('data-section-id');
+			
+			if (scrollTop >= sectionTop) {
+				activeSection = sectionId;
+			}
+		});
+		
+		// Update link styles
+		sectionLinks.forEach((link) => {
+			const linkSection = link.getAttribute('data-section-link');
+			if (linkSection === activeSection) {
+				link.classList.add('section-nav-link-active');
+			} else {
+				link.classList.remove('section-nav-link-active');
+			}
+		});
+	}
+	
+	// Smooth scroll to section on nav link click
+	sectionLinks.forEach((link) => {
+		link.addEventListener('click', (e) => {
+			e.preventDefault();
+			const sectionId = link.getAttribute('data-section-link');
+			const targetSection = document.getElementById(sectionId || '');
+			
+			if (targetSection) {
+				const navHeight = sectionNav?.offsetHeight || 0;
+				const targetTop = targetSection.offsetTop - navHeight - 20;
+				
+				window.scrollTo({
+					top: targetTop,
+					behavior: 'smooth'
+				});
+			}
+		});
+	});
+	
+	// Throttle scroll handler for performance
+	let scrollTimeout: number | null = null;
+	window.addEventListener('scroll', () => {
+		if (scrollTimeout) return;
+		scrollTimeout = window.setTimeout(() => {
+			updateActiveSection();
+			scrollTimeout = null;
+		}, 50);
+	});
+	
+	// Initial check
+	updateActiveSection();
+
+	// ========================================
+	// LIGHTBOX FUNCTIONALITY
+	// ========================================
 	const modal = document.getElementById('lightbox-modal');
 	const modalImage = document.getElementById('lightbox-image');
 	const closeBtn = document.getElementById('lightbox-close');

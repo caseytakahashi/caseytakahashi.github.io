@@ -6,29 +6,132 @@ import Layout from '../layouts/Layout.astro';
 	<main class="page-background">
 		<section class="page-layout">
 			<p class="page-title">Let's Connect</p>
-			<div class="space-y-5 page-section-text">
-				I’d love to hear from you! Whether you’re ready to book a session or just have a few questions, you’re always welcome to reach out.
+			<div class="page-section-text">
+				I'd love to hear from you! Whether you're ready to book a session or just have a few questions, you're always welcome to reach out.
 			</div>
 
-			<section class="page-section">
-				<h2 class="page-section-header">Session Inquiry</h2>
-				<div class="space-y-5 page-section-text">
-					<p class="mb-5">If you're interested in a photography session, please fill out a quick inquiry form so I can better understand your vision and recommend the best next steps.</p> 
-					<a href="https://forms.gle/vYB2LdnewiTazAuB8" class="inquiry-link" target="_blank" rel="noopener noreferrer">Start a Session Inquiry<span class="inquiry-arrow">↗</span></a>
+			<!-- Session Inquiry Card -->
+			<section class="mx-auto w-full max-w-2xl rounded-2xl border border-slate-200/80 bg-white/60 p-6 md:p-8">
+				<h2 class="page-section-header mb-5">Photography Session Inquiry</h2>
+				<div class="page-section-text">
+					<p>Fill out a quick inquiry form and I'll follow up with availability, recommendations, and next steps.</p>
+				</div>
+				<div class="mt-4 flex flex-col items-start gap-2">
+					<a
+						href="https://forms.gle/vYB2LdnewiTazAuB8"
+						class="cta-button whitespace-nowrap"
+						target="_blank"
+						rel="noopener noreferrer"
+					>
+						Start a Session Inquiry
+					</a>
+					<p class="font-sans text-sm text-slate-500">Typically responds within 24–48 hours.</p>
 				</div>
 			</section>
 
-			<hr class="page-section-divider" />
+			<!-- Divider -->
+			<hr class="mx-auto my-1 w-full max-w-sm border-t border-slate-200" />
 
-			<section class="page-section">
-				<h2 class="page-section-header">Questions Welcome</h2>
-				<div class="space-y-5 page-section-text">
-					You can email me anytime at
-					<a href="mailto:caseytakahashiphoto@gmail.com" class="inquiry-link">caseytakahashiphoto@gmail.com<span class="inquiry-arrow">↗</span></a>
-					. I’m always happy to answer questions or talk through ideas.
+			<!-- Questions -->
+			<section class="pb-6">
+				<h3 class="about-subheader">Have questions?</h3>
+				<div class="page-section-text">
+					<p>Email me anytime at <a href="mailto:caseytakahashiphoto@gmail.com" class="text-slate-900 decoration-slate-300/70 underline-offset-3 transition-all hover:underline hover:decoration-slate-500">caseytakahashiphoto@gmail.com</a>. I'm always happy to answer questions or talk through ideas.</p>
+				</div>
+				<div class="mt-5 flex flex-col gap-2.5 sm:flex-row sm:gap-3">
+					<button
+						id="copy-email-btn"
+						type="button"
+						class="cta-button-ghost inline-grid"
+					>
+						<span id="copy-label" class="col-start-1 row-start-1">Copy Email</span>
+						<span id="copy-success" class="col-start-1 row-start-1 invisible">Copied!</span>
+						<span id="copy-fail" class="col-start-1 row-start-1 invisible">Copy Failed</span>
+						<span id="copy-sr" class="sr-only" aria-live="polite"></span>
+					</button>
+					<a
+						href="https://mail.google.com/mail/?view=cm&fs=1&to=caseytakahashiphoto@gmail.com&su=Photography%20Session%20Inquiry"
+						class="cta-button-ghost text-center"
+						target="_blank"
+						rel="noreferrer noopener"
+					>
+						Open in Gmail
+					</a>
 				</div>
 			</section>
 		</section>
 	</main>
 </Layout>
 
+<script>
+	const EMAIL = 'caseytakahashiphoto@gmail.com';
+	const btn = document.getElementById('copy-email-btn');
+	const label = document.getElementById('copy-label');
+	const success = document.getElementById('copy-success');
+	const fail = document.getElementById('copy-fail');
+	const sr = document.getElementById('copy-sr');
+
+	let timeout: ReturnType<typeof setTimeout> | null = null;
+
+	function resetButton() {
+		if (timeout) clearTimeout(timeout);
+		label?.classList.remove('invisible');
+		success?.classList.add('invisible');
+		fail?.classList.add('invisible');
+		btn?.classList.remove('cta-button-ghost-copied');
+		if (sr) sr.textContent = '';
+	}
+
+	function showCopied() {
+		resetButton();
+		label?.classList.add('invisible');
+		success?.classList.remove('invisible');
+		btn?.classList.add('cta-button-ghost-copied');
+		if (sr) sr.textContent = 'Email address copied to clipboard.';
+		timeout = setTimeout(resetButton, 2000);
+	}
+
+	function showFailed() {
+		resetButton();
+		label?.classList.add('invisible');
+		fail?.classList.remove('invisible');
+		if (sr) sr.textContent = 'Failed to copy. Please copy the email address manually.';
+		timeout = setTimeout(resetButton, 2000);
+	}
+
+	function fallbackCopy() {
+		const input = document.createElement('input');
+		input.value = EMAIL;
+		input.setAttribute('readonly', '');
+		input.style.position = 'absolute';
+		input.style.left = '-9999px';
+		document.body.appendChild(input);
+		input.select();
+
+		try {
+			const ok = document.execCommand('copy');
+			if (ok) {
+				showCopied();
+			} else {
+				showFailed();
+			}
+		} catch {
+			showFailed();
+		} finally {
+			document.body.removeChild(input);
+		}
+	}
+
+	btn?.addEventListener('click', async () => {
+		if (navigator.clipboard?.writeText) {
+			try {
+				await navigator.clipboard.writeText(EMAIL);
+				showCopied();
+			} catch {
+				fallbackCopy();
+			}
+		} else {
+			fallbackCopy();
+		}
+	});
+</script>
