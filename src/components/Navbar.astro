@@ -1,3 +1,8 @@
+---
+import { getCollection } from 'astro:content';
+const galleries = (await getCollection('galleries')).sort((a, b) => a.id.localeCompare(b.id));
+---
+
 <nav class="bg-white border-b border-gray-200 relative">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <!-- Small screen layout: hamburger + centered logo -->
@@ -46,7 +51,29 @@
         
         <!-- Medium+ screen layout: original grid -->
         <div class="hidden md:grid grid-cols-[1fr_1fr_auto_1fr_1fr] items-center h-20 sm:h-24 lg:h-28">
-          <a class="nav-link-desktop text-center" href="/galleries">Portfolio</a>
+          <div class="relative group flex justify-center" id="portfolio-dropdown">
+            <a class="nav-link-desktop text-center" href="/galleries">Portfolio</a>
+            <div class="absolute top-full left-1/2 -translate-x-1/2 pt-2 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 ease-out z-50">
+              <div class="bg-white border border-slate-200 rounded-lg shadow-lg py-2 min-w-[200px]">
+                {galleries.map((gallery) => (
+                  <a
+                    href={`/galleries/${gallery.id}`}
+                    class="block px-5 py-2 text-sm font-myeongjo text-slate-600 hover:text-slate-900 hover:bg-slate-50 transition-colors whitespace-nowrap"
+                  >
+                    {gallery.data.title}
+                  </a>
+                ))}
+                <div class="border-t border-slate-100 mt-1 pt-1">
+                  <a
+                    href="/galleries"
+                    class="block px-5 py-2 text-xs uppercase tracking-widest text-slate-400 hover:text-slate-700 hover:bg-slate-50 transition-colors"
+                  >
+                    View All
+                  </a>
+                </div>
+              </div>
+            </div>
+          </div>
           <a class="nav-link-desktop text-center" href="/about">About</a>
         
           <a href="/" class="block px-4">

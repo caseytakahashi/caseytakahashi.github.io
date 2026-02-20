@@ -213,19 +213,20 @@ if (isSectionedGallery) {
 			<!-- SECTIONED GALLERY LAYOUT (Beyond the Portrait) -->
 			<!-- ========================================== -->
 			<section class="page-layout">
-				<!-- Back link -->
 				<a
+					id="back-to-portfolio-float"
 					href="/galleries"
-					class="flex items-center text-sm text-slate-600 hover:text-slate-900 mb-4 w-fit group"
+					class="sticky top-4 z-40 self-start flex items-center gap-2 rounded-full bg-white/90 px-4 py-2 text-sm font-medium text-slate-500 shadow-sm shadow-slate-900/5 backdrop-blur-md border border-slate-200/60 transition-all duration-200 ease-out hover:bg-white hover:text-slate-900 hover:shadow-md group"
+					aria-label="Back to Portfolio"
 				>
-					<svg class="h-4 w-4 mr-2 transition-transform group-hover:-translate-x-1" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 20 20">
+					<svg class="h-3.5 w-3.5 transition-transform duration-200 group-hover:-translate-x-0.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 20 20">
 						<path stroke-linecap="round" stroke-linejoin="round" d="M15 10H5m0 0l5-5m-5 5l5 5" />
 					</svg>
-					Back to Portfolio
+					Portfolio
 				</a>
 
 				<!-- Page title -->
-				<div class="flex flex-col gap-4 mb-6">
+				<div class="flex flex-col gap-4 mb-6 -mt-4">
 					<h1 class="page-title">{gallery.data.title}</h1>
 				</div>
 
@@ -388,17 +389,20 @@ if (isSectionedGallery) {
 			<!-- ========================================== -->
 			<section class="page-layout">
 				<a
+					id="back-to-portfolio-float"
 					href="/galleries"
-					class="flex items-center text-sm text-slate-600 hover:text-slate-900 mb-4 w-fit group"
+					class="sticky top-4 z-40 self-start flex items-center gap-2 rounded-full bg-white/90 px-4 py-2 text-sm font-medium text-slate-500 shadow-sm shadow-slate-900/5 backdrop-blur-md border border-slate-200/60 transition-all duration-200 ease-out hover:bg-white hover:text-slate-900 hover:shadow-md group"
+					aria-label="Back to Portfolio"
 				>
-					<svg class="h-4 w-4 mr-2 transition-transform group-hover:-translate-x-1" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 20 20">
+					<svg class="h-3.5 w-3.5 transition-transform duration-200 group-hover:-translate-x-0.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 20 20">
 						<path stroke-linecap="round" stroke-linejoin="round" d="M15 10H5m0 0l5-5m-5 5l5 5" />
 					</svg>
-					Back to Portfolio
+					Portfolio
 				</a>
-				<div class="flex flex-col gap-4">
-					<h1 class="page-title">{gallery.data.title}</h1>
-				</div>
+
+			<div class="flex flex-col gap-4 -mt-4">
+				<h1 class="page-title">{gallery.data.title}</h1>
+			</div>
 
 				<!-- Mobile: 1 column, strict file order -->
 				<div class="flex flex-col gap-2 sm:gap-3 md:hidden">
@@ -767,4 +771,17 @@ if (isSectionedGallery) {
 			navigate('next');
 		}
 	});
+
+	// ========================================
+	// HIDE BACK BUTTON WHEN LIGHTBOX IS OPEN
+	// ========================================
+	const floatingBtn = document.getElementById('back-to-portfolio-float');
+	const lightboxForBtn = document.getElementById('lightbox-modal');
+
+	if (floatingBtn && lightboxForBtn) {
+		const lightboxObserver = new MutationObserver(() => {
+			floatingBtn.style.visibility = lightboxForBtn.classList.contains('hidden') ? '' : 'hidden';
+		});
+		lightboxObserver.observe(lightboxForBtn, { attributes: true, attributeFilter: ['class'] });
+	}
 </script>
