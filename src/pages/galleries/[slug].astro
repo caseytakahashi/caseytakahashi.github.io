@@ -255,9 +255,13 @@ if (isSectionedGallery) {
 				<!-- Render each section -->
 				{gallerySections.map((section, sectionIdx) => {
 					const sectionIndices = sectionImageIndices.get(section.id) || [];
-					const sectionLeftImages = section.images.filter((_, i) => i % 2 === 0);
-					const sectionRightImages = section.images.filter((_, i) => i % 2 === 1);
 					const baseIndex = sectionIndices[0] || 0;
+
+					const isPanoSection = section.id === '01-landscapes';
+					const heroImage = isPanoSection ? section.images[0] : null;
+					const remainingImages = isPanoSection ? section.images.slice(1) : section.images;
+					const sectionLeftImages = remainingImages.filter((_, i) => i % 2 === 0);
+					const sectionRightImages = remainingImages.filter((_, i) => i % 2 === 1);
 
 					return (
 						<section 
@@ -292,34 +296,53 @@ if (isSectionedGallery) {
 								))}
 							</div>
 
-							<!-- Desktop: 2 columns masonry -->
-							<div class="hidden md:grid md:grid-cols-2 gap-5 lg:gap-6">
-								<!-- Left column -->
-								<div class="flex flex-col gap-5 lg:gap-6">
-									{sectionLeftImages.map((imagePath: string, imgIdx: number) => (
-										<img
-											class="w-full h-auto cursor-pointer transition-opacity hover:opacity-95"
-											src={imagePath}
-											alt={`${section.displayName} image ${imgIdx * 2 + 1}`}
-											loading="lazy"
-											data-index={baseIndex + imgIdx * 2}
-											data-gallery-image
-										/>
-									))}
-								</div>
+							<!-- Desktop: panorama hero + 2 columns masonry -->
+							<div class="hidden md:flex md:flex-col gap-5 lg:gap-6">
+								{heroImage && (
+									<img
+										class="w-full h-auto cursor-pointer transition-opacity hover:opacity-95"
+										src={heroImage}
+										alt={`${section.displayName} image 1`}
+										loading="lazy"
+										data-index={baseIndex}
+										data-gallery-image
+									/>
+								)}
 
-								<!-- Right column -->
-								<div class="flex flex-col gap-5 lg:gap-6">
-									{sectionRightImages.map((imagePath: string, imgIdx: number) => (
-										<img
-											class="w-full h-auto cursor-pointer transition-opacity hover:opacity-95"
-											src={imagePath}
-											alt={`${section.displayName} image ${imgIdx * 2 + 2}`}
-											loading="lazy"
-											data-index={baseIndex + imgIdx * 2 + 1}
-											data-gallery-image
-										/>
-									))}
+								<div class="grid grid-cols-2 gap-5 lg:gap-6">
+									<!-- Left column -->
+									<div class="flex flex-col gap-5 lg:gap-6">
+										{sectionLeftImages.map((imagePath: string, imgIdx: number) => {
+											const offset = heroImage ? 1 : 0;
+											return (
+												<img
+													class="w-full h-auto cursor-pointer transition-opacity hover:opacity-95"
+													src={imagePath}
+													alt={`${section.displayName} image ${imgIdx * 2 + 1 + offset}`}
+													loading="lazy"
+													data-index={baseIndex + imgIdx * 2 + offset}
+													data-gallery-image
+												/>
+											);
+										})}
+									</div>
+
+									<!-- Right column -->
+									<div class="flex flex-col gap-5 lg:gap-6">
+										{sectionRightImages.map((imagePath: string, imgIdx: number) => {
+											const offset = heroImage ? 1 : 0;
+											return (
+												<img
+													class="w-full h-auto cursor-pointer transition-opacity hover:opacity-95"
+													src={imagePath}
+													alt={`${section.displayName} image ${imgIdx * 2 + 2 + offset}`}
+													loading="lazy"
+													data-index={baseIndex + imgIdx * 2 + 1 + offset}
+													data-gallery-image
+												/>
+											);
+										})}
+									</div>
 								</div>
 							</div>
 						</section>
