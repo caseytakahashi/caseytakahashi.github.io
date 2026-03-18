@@ -84,7 +84,7 @@
     .landing-title {
         @apply text-center leading-tight
             text-4xl 
-            font-semibold 
+            font-myeongjo 
             text-slate-900 
             sm:text-5xl;
     }
@@ -92,6 +92,7 @@
     .landing-text {
         @apply text-center leading-tight
             text-lg 
+            font-myeongjo
             text-slate-600 
     }
 

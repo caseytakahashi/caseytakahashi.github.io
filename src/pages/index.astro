@@ -1,54 +1,77 @@
 ---
 import Layout from '../layouts/Layout.astro';
-import { getCollection, type CollectionEntry } from 'astro:content';
+import { getCollection } from 'astro:content';
 
-const galleries = (await getCollection('galleries')).sort((a, b) => a.id.localeCompare(b.id))
+const slideshowImages: { src: string; x?: string; y?: string; scale?: number }[] = [
+	// { src: '/galleries/02-families/01.webp',    y: '40%' },
+	// { src: '/galleries/01-engagements/07.webp', y: '80%' },
+	{ src: '/galleries/01-engagements/08.webp', y: '55%', x: '30%' },
+	{ src: '/galleries/03-newborns/02.webp',    y: '90%' },
+];
 ---
 
 <Layout>
-	<main class="page-background">
-		<section class="page-layout">
-			<h1 class="landing-title">Portrait photography in the San Francisco Bay Area</h1>
-			<p class="landing-text">
-				Families • Couples • Individuals
-			</p>
-			<div class="flex flex-wrap justify-center gap-4">
-				<a class="rounded-full bg-slate-900 px-6 py-3 text-sm font-medium text-white" href="/galleries">View galleries</a>
-				<a class="rounded-full border border-slate-900 px-6 py-3 text-sm font-medium text-slate-900" href="/contact">Book a shoot</a>
-			</div>
-		</section>
-		<section class="mx-auto flex max-w-6xl flex-col gap-8 px-6 pb-24">
-			<div class="flex items-center justify-between">
-				<p class="text-sm uppercase tracking-[0.3em] text-slate-900">Galleries</p>
-				<a class="text-sm font-semibold text-slate-900 underline-offset-4 hover:underline" href="/galleries"
-					>View all</a
+	<main class="relative h-[calc(100vh-5rem)] sm:h-[calc(100vh-6rem)] lg:h-[calc(100vh-7rem)] overflow-hidden">
+		<!-- Slideshow background -->
+		<div id="slideshow" class="absolute inset-0">
+			{slideshowImages.map((slide, i) => (
+				<div
+					class:list={[
+						"slideshow-slide absolute inset-0 transition-opacity duration-1500 ease-in-out",
+						i === 0 ? "opacity-100" : "opacity-0"
+					]}
+					data-slide={i}
 				>
-			</div>
-			{galleries.length === 0 ? (
-				<p class="text-slate-600">Featured collections will appear here once galleries are published.</p>
-			) : (
-				<div class="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-					{galleries.map((gallery: CollectionEntry<'galleries'>) => (
-						<a
-							class="group overflow-hidden rounded-2xl border border-slate-200 bg-white transition hover:border-slate-400 hover:shadow-lg"
-							href={`/galleries/${gallery.id}`}
-						>
-							<div class="aspect-4/3 w-full overflow-hidden bg-slate-100">
-								<img
-									class="h-full w-full object-cover transition duration-500 group-hover:scale-105"
-									src={`${gallery.data.basePath}/${gallery.data.coverImage}`}
-									alt={gallery.data.title}
-									loading="lazy"
-								/>
-							</div>
-							<div class="flex flex-col gap-1 px-5 py-5">
-								<h3 class="text-xl font-semibold text-slate-900">{gallery.data.title}</h3>
-								<p class="text-sm text-slate-500">{gallery.data.location}</p>
-							</div>
-						</a>
-					))}
+					<img
+						src={slide.src}
+						alt=""
+						class="h-full w-full object-cover"
+						style={`object-position: ${slide.x ?? 'center'} ${slide.y ?? 'center'};${slide.scale ? ` transform: scale(${slide.scale});` : ''}`}
+						loading={i === 0 ? "eager" : "lazy"}
+					/>
 				</div>
-			)}
+			))}
+			<!-- Dark overlay for text legibility -->
+			<div class="absolute inset-0 bg-black/40"></div>
+		</div>
+
+		<!-- Content -->
+		<section class="relative z-10 flex h-full flex-col items-center justify-center gap-6 px-8 text-center">
+			<h1 class="landing-title text-white drop-shadow-lg">Portrait photography in the SF Bay Area</h1>
+			<p class="landing-text text-white/85 drop-shadow-md">
+				Families &bull; Couples &bull; Individuals
+			</p>
+			<div class="mt-2 flex flex-wrap justify-center gap-4">
+				<a
+					class="rounded-full bg-white px-6 py-3 text-sm font-medium text-slate-900 transition hover:bg-white/90"
+					href="/galleries"
+				>
+					View Portfolio
+				</a>
+				<a
+					class="rounded-full border border-white px-6 py-3 text-sm font-medium text-white transition hover:bg-white/10"
+					href="/contact"
+				>
+					Book a Session
+				</a>
+			</div>
 		</section>
 	</main>
 </Layout>
+
+<script>
+	const slides = document.querySelectorAll('.slideshow-slide');
+	if (slides.length > 1) {
+		let current = 0;
+		const INTERVAL = 5000;
+
+		setInterval(() => {
+			const next = (current + 1) % slides.length;
+			slides[current].classList.remove('opacity-100');
+			slides[current].classList.add('opacity-0');
+			slides[next].classList.remove('opacity-0');
+			slides[next].classList.add('opacity-100');
+			current = next;
+		}, INTERVAL);
+	}
+</script>
