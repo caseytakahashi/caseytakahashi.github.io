@@ -1,8 +1,8 @@
 ---
 title: 'Beyond the Portrait'
 location: 'Various'
-basePath: '/galleries/03-beyond-the-portrait'
-coverImage: '01-landscapes/05.webp'
+basePath: '/galleries/04-beyond-the-portrait'
+coverImage: '01-landscapes/04.webp'
 description: 'Editorial-inspired portraits that lean into marble architecture and soft afternoon light.'
 ---
 
