@@ -5,8 +5,9 @@ import { getCollection } from 'astro:content';
 const slideshowImages: { src: string; x?: string; y?: string; scale?: number }[] = [
 	{ src: '/galleries/02-families/01.webp',    y: '40%' },
 	{ src: '/galleries/01-engagements/07.webp', y: '80%' },
-	{ src: '/galleries/01-engagements/08.webp', y: '55%', x: '30%' },
 	{ src: '/galleries/03-newborns/02.webp',    y: '90%' },
+	{ src: '/galleries/01-engagements/08.webp', y: '55%', x: '30%' },
+	{ src: '/galleries/03-newborns/04.webp',    y: '30%' },
 ];
 ---
 
@@ -17,7 +18,7 @@ const slideshowImages: { src: string; x?: string; y?: string; scale?: number }[]
 			{slideshowImages.map((slide, i) => (
 				<div
 					class:list={[
-						"slideshow-slide absolute inset-0 transition-opacity duration-1500 ease-in-out",
+						"slideshow-slide absolute inset-0 transition-opacity duration-2000 ease-in-out",
 						i === 0 ? "opacity-100" : "opacity-0"
 					]}
 					data-slide={i}
@@ -63,7 +64,7 @@ const slideshowImages: { src: string; x?: string; y?: string; scale?: number }[]
 	const slides = document.querySelectorAll('.slideshow-slide');
 	if (slides.length > 1) {
 		let current = 0;
-		const INTERVAL = 5000;
+		const INTERVAL = 4000;
 
 		setInterval(() => {
 			const next = (current + 1) % slides.length;
